@@ -1,0 +1,19 @@
+# Runtime
+node_modules/
+.next/
+dist/
+build/
+
+# Logs
+*.log
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Secrets
+.env
+.env.local
+
+# Generated indexes
+data/index/
