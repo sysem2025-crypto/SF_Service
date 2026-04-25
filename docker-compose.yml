@@ -1,0 +1,12 @@
+services:
+  web:
+    build:
+      context: .
+    container_name: sf-service-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production
+    volumes:
+      - ./data:/app/data
