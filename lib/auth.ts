@@ -90,7 +90,7 @@ export async function requireUser() {
   const user = await getCurrentUser();
 
   if (!user) {
-    redirect("/login?error=login-required");
+    redirect("/login");
   }
 
   return user;
