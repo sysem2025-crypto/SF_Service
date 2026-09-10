@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SupabaseProvider from "@/components/supabase-provider";
+import AppShell from "@/components/app-shell";
 
 export const metadata: Metadata = {
   title: "SF Service Portal",
@@ -15,7 +16,9 @@ export default function RootLayout({
   return (
     <html lang="it">
       <body>
-        <SupabaseProvider>{children}</SupabaseProvider>
+        <SupabaseProvider>
+          <AppShell>{children}</AppShell>
+        </SupabaseProvider>
       </body>
     </html>
   );
