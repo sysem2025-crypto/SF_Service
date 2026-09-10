@@ -1,14 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useSession } from "@/components/supabase-provider";
 import { createClient } from "@/lib/supabase";
+import type { Route } from "next";
+
+const navItems: { href: Route; label: string }[] = [
+  { href: "/my-tickets", label: "I miei ticket" },
+  { href: "/ticket/nuovo", label: "Nuovo ticket" },
+];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const session = useSession();
   const pathname = usePathname();
-  const router = useRouter();
   const supabase = createClient();
 
   async function handleLogout() {
@@ -19,15 +24,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     window.location.href = "/";
   }
 
-  const navItems = [
-    { href: "/my-tickets", label: "I miei ticket" },
-    { href: "/ticket/nuovo", label: "Nuovo ticket" },
-  ];
-
   return (
     <div className="app-shell">
       <header className="app-header">
-        <Link href="/my-tickets" className="app-logo">SF Service</Link>
+        <Link href="/" className="app-logo">SF Service</Link>
         <nav className="app-nav">
           {navItems.map((item) => (
             <Link
