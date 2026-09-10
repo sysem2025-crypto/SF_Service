@@ -45,4 +45,5 @@ Questa base serve a:
 1. popolare `data/clienti` con i clienti attuali;
 2. standardizzare i ticket esistenti secondo il template;
 3. scaffoldare la web app in `app/`;
-4. aggiungere script di indicizzazione e ricerca in `scripts/`.
+4. aggiungere script di indicizzazione e ricerca in `scripts/`;
+5. SSO unificato con SYSEM portal.
