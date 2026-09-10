@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
   const refreshToken = url.searchParams.get("refresh_token") || "";
-  const defaultRedirect = url.searchParams.get("redirect") || "/my-tickets";
+  const defaultRedirect = url.searchParams.get("redirect") || "/";
 
   if (!token) {
     return NextResponse.redirect(
@@ -26,8 +26,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const isAdmin = user.email.endsWith("@sysem.it");
-    const redirect = defaultRedirect === "/my-tickets" && isAdmin ? "/ticket" : defaultRedirect;
+    const redirect = defaultRedirect;
 
     const response = NextResponse.redirect(new URL(redirect, request.url), 303);
 
