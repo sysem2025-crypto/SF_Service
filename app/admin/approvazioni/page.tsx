@@ -1,9 +1,18 @@
 import { requireAdmin } from "@/lib/auth";
-import { getPendingApprovals } from "@/lib/approval";
+import { createClient } from "@/lib/supabase-server";
+import ApproveButton from "./approve-button";
 
 export default async function AdminApprovalsPage() {
   await requireAdmin();
-  const approvals = getPendingApprovals().filter((item) => item.status === "pending");
+  const supabase = await createClient();
+
+  const { data: pendingUsers } = await supabase
+    .from("profiles")
+    .select("id, full_name, role, status, created_at")
+    .eq("status", "pending")
+    .order("created_at", { ascending: true });
+
+  const users = pendingUsers || [];
 
   return (
     <main className="page-shell">
@@ -17,25 +26,21 @@ export default async function AdminApprovalsPage() {
       <section className="surface">
         <div className="section-heading">
           <h2>Utenti in attesa</h2>
-          <p>{approvals.length} richieste</p>
+          <p>{users.length} richieste</p>
         </div>
 
         <div className="approval-list">
-          {approvals.map((approval) => (
-            <article key={approval.id} className="document-card">
-              <strong>{approval.name}</strong>
-              <p>{approval.email}</p>
-              <p>{approval.createdAt.slice(0, 10)}</p>
-              <form action="/api/admin/approve-user" method="post">
-                <input type="hidden" name="approvalId" value={approval.id} />
-                <button type="submit" className="primary-link button-reset">
-                  Approva
-                </button>
-              </form>
+          {users.map((u) => (
+            <article key={u.id} className="document-card">
+              <strong>{u.full_name || "Senza nome"}</strong>
+              <p>ID: {u.id}</p>
+              <p>Ruolo: {u.role}</p>
+              <p>Registrato: {u.created_at?.slice(0, 10)}</p>
+              <ApproveButton userId={u.id} />
             </article>
           ))}
-          {!approvals.length && (
-            <p className="empty-state">Nessuna richiesta.</p>
+          {!users.length && (
+            <p className="empty-state">Nessuna richiesta in attesa.</p>
           )}
         </div>
       </section>

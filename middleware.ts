@@ -55,6 +55,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
+  if (isProtected && user && !isAuthPage) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role, status")
+      .eq("id", user.id)
+      .single();
+
+    if (profile && profile.status === "pending") {
+      return NextResponse.redirect(new URL("/pending-approval", request.url));
+    }
+  }
+
   if (isAuthPage && user) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/";

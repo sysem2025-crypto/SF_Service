@@ -1,22 +1,28 @@
 import { NextResponse } from "next/server";
-import { approvePendingApproval } from "@/lib/approval";
-import { getCurrentUser } from "@/lib/auth";
+import { requireAdmin } from "@/lib/auth";
+import { createClient } from "@/lib/supabase-server";
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
+  const admin = await requireAdmin();
 
-  if (!user || user.role !== "admin") {
-    return NextResponse.redirect(new URL("/login?error=admin-required", request.url), 303);
+  const body = await request.json();
+  const userId = body.userId;
+
+  if (!userId) {
+    return NextResponse.json({ error: "userId required" }, { status: 400 });
   }
 
-  const formData = await request.formData();
-  const approvalId = String(formData.get("approvalId") || "");
+  const supabase = await createClient();
 
-  if (!approvalId) {
-    return NextResponse.redirect(new URL("/admin/approvals", request.url), 303);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ status: "approved", updated_at: new Date().toISOString() })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("[Approve] Error:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  approvePendingApproval(approvalId);
-
-  return NextResponse.redirect(new URL("/admin/approvals", request.url), 303);
+  return NextResponse.json({ ok: true });
 }
