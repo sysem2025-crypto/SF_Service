@@ -13,34 +13,42 @@ export async function GET(request: Request) {
     );
   }
 
-  const supabase = await createClient();
+  try {
+    const supabase = await createClient();
 
-  const { data: { user }, error } = await supabase.auth.getUser(token);
+    const { data: { user }, error } = await supabase.auth.getUser(token);
 
-  if (error || !user || !user.email) {
+    if (error || !user || !user.email) {
+      return NextResponse.redirect(
+        new URL(`/login?error=invalid-token&redirect=${encodeURIComponent(redirect)}`, request.url),
+        303
+      );
+    }
+
+    const response = NextResponse.redirect(new URL(redirect, request.url), 303);
+
+    response.cookies.set("sso_access_token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    response.cookies.set("sso_user_email", user.email, {
+      httpOnly: false,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    return response;
+  } catch (err) {
+    console.error("[SSO] Error:", err);
     return NextResponse.redirect(
-      new URL(`/login?error=invalid-token&redirect=${encodeURIComponent(redirect)}`, request.url),
+      new URL(`/login?error=session-error&redirect=${encodeURIComponent(redirect)}`, request.url),
       303
     );
   }
-
-  const response = NextResponse.redirect(new URL(redirect, request.url), 303);
-
-  response.cookies.set("sso_access_token", token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24,
-  });
-
-  response.cookies.set("sso_user_email", user.email, {
-    httpOnly: false,
-    secure: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 24,
-  });
-
-  return response;
 }
