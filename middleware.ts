@@ -29,13 +29,21 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const {
+  let {
     data: { user },
   } = await supabase.auth.getUser();
 
+  const ssoToken = request.cookies.get("sso_access_token")?.value;
+
+  if (!user && ssoToken) {
+    const { data: { user: ssoUser } } = await supabase.auth.getUser(ssoToken);
+    if (ssoUser) {
+      user = ssoUser;
+    }
+  }
+
   const path = request.nextUrl.pathname;
 
-  // Protected routes
   const protectedPaths = ["/ticket", "/my-tickets", "/procedure", "/firmware-software", "/admin"];
   const isProtected = protectedPaths.some((p) => path.startsWith(p));
   const isAuthPage = path.startsWith("/login") || path.startsWith("/register");
@@ -53,7 +61,6 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Admin check
   if (path.startsWith("/admin") && user) {
     const { data: profile } = await supabase
       .from("profiles")

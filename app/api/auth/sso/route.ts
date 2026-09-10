@@ -25,5 +25,22 @@ export async function GET(request: Request) {
   }
 
   const response = NextResponse.redirect(new URL(redirect, request.url), 303);
+
+  response.cookies.set("sso_access_token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24,
+  });
+
+  response.cookies.set("sso_user_email", user.email, {
+    httpOnly: false,
+    secure: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24,
+  });
+
   return response;
 }
