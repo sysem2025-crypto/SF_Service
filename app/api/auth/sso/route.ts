@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase-server";
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
-  const redirect = url.searchParams.get("redirect") || "/ticket/nuovo";
+  const refreshToken = url.searchParams.get("refresh_token") || "";
+  const redirect = url.searchParams.get("redirect") || "/ticket";
 
   if (!token) {
     return NextResponse.redirect(
@@ -28,7 +29,15 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(new URL(redirect, request.url), 303);
 
     response.cookies.set("sso_access_token", token, {
-      httpOnly: true,
+      httpOnly: false,
+      secure: true,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24,
+    });
+
+    response.cookies.set("sso_refresh_token", refreshToken, {
+      httpOnly: false,
       secure: true,
       sameSite: "lax",
       path: "/",
