@@ -22,17 +22,20 @@ export default function SupabaseProvider({ children }: { children: ReactNode }) 
 
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log("[Provider] Existing session:", session ? "yes" : "no");
       if (session) {
         setSession(session);
         return;
       }
       const accessToken = getCookie("sso_access_token");
       const refreshToken = getCookie("sso_refresh_token");
+      console.log("[Provider] SSO cookies:", accessToken ? "token found" : "no token", refreshToken ? "refresh found" : "no refresh");
       if (accessToken) {
-        const { data } = await supabase.auth.setSession({
+        const { data, error } = await supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken || "",
         });
+        console.log("[Provider] setSession result:", error ? error.message : "ok", data.session ? "session=yes" : "session=no");
         setSession(data.session);
       }
     });

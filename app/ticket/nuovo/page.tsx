@@ -35,6 +35,7 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
     setLoading(true);
 
     const { data: { user } } = await supabase.auth.getUser();
+    console.log("[Ticket] getUser:", user ? user.email : "null", "cookies:", document.cookie.substring(0, 200));
     if (!user) {
       setError("Devi essere autenticato");
       setLoading(false);

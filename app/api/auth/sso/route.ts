@@ -30,23 +30,25 @@ export async function GET(request: Request) {
 
     response.cookies.set("sso_access_token", token, {
       httpOnly: false,
-      secure: true,
+      secure: false,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24,
     });
 
-    response.cookies.set("sso_refresh_token", refreshToken, {
-      httpOnly: false,
-      secure: true,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24,
-    });
+    if (refreshToken) {
+      response.cookies.set("sso_refresh_token", refreshToken, {
+        httpOnly: false,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24,
+      });
+    }
 
     response.cookies.set("sso_user_email", user.email, {
       httpOnly: false,
-      secure: true,
+      secure: false,
       sameSite: "lax",
       path: "/",
       maxAge: 60 * 60 * 24,
