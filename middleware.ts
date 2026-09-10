@@ -57,7 +57,7 @@ export async function middleware(request: NextRequest) {
 
   if (isAuthPage && user) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/ticket/nuovo";
+    redirectUrl.pathname = "/";
     return NextResponse.redirect(redirectUrl);
   }
 
