@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase-server";
+import { createClient as createServiceClient } from "@supabase/supabase-js";
 
 export async function POST(request: Request) {
   await requireAdmin();
@@ -23,6 +24,20 @@ export async function POST(request: Request) {
 
     if (error) {
       console.error("[Reject] Error:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  } else if (action === "delete") {
+    await supabase.from("profiles").delete().eq("id", userId);
+
+    const adminClient = createServiceClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
+    const { error } = await adminClient.auth.admin.deleteUser(userId);
+
+    if (error) {
+      console.error("[Delete] Error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   } else {

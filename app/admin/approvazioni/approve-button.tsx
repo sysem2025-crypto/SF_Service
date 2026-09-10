@@ -18,11 +18,12 @@ export default function ApproveButton({ userId }: { userId: string }) {
   }
 
   async function handleReject() {
+    if (!confirm("Eliminare definitivamente questo utente?")) return;
     setLoading(true);
     await fetch("/api/admin/approve-user", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ userId, action: "reject" }),
+      body: JSON.stringify({ userId, action: "delete" }),
     });
     router.refresh();
   }
