@@ -39,18 +39,17 @@ export default async function MyTicketsPage() {
           <p className="eyebrow">My Tickets</p>
           <h1 className="section-title">I miei ticket</h1>
         </div>
-
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <Link href="/ticket/nuovo" className="text-link" style={{ fontWeight: 600 }}>
-            + Nuovo ticket
-          </Link>
-        </div>
       </section>
 
       <section className="surface">
         <div className="section-heading">
           <h2>Ticket aperti</h2>
-          <p>{tickets.length} record</p>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+            <p>{tickets.length} record</p>
+            <Link href="/ticket/nuovo" className="text-link" style={{ fontWeight: 600 }}>
+              + Nuovo ticket
+            </Link>
+          </div>
         </div>
 
         {tickets.length ? (
