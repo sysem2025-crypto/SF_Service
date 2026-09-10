@@ -40,9 +40,11 @@ export default async function MyTicketsPage() {
           <h1 className="section-title">I miei ticket</h1>
         </div>
 
-        <Link href="/" className="text-link">
-          Portal
-        </Link>
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <Link href="/ticket/nuovo" className="text-link" style={{ fontWeight: 600 }}>
+            + Nuovo ticket
+          </Link>
+        </div>
       </section>
 
       <section className="surface">

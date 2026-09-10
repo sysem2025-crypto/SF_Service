@@ -40,14 +40,9 @@ export default async function TicketPage() {
           <h1 className="section-title">Lista ticket</h1>
         </div>
 
-        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-          <Link href="/ticket/nuovo" className="text-link" style={{ fontWeight: 600 }}>
-            + Nuovo ticket
-          </Link>
-          <Link href="/admin" className="text-link">
-            Dashboard
-          </Link>
-        </div>
+        <Link href="/admin" className="text-link">
+          Dashboard
+        </Link>
       </section>
 
       <section className="surface filters-surface">

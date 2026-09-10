@@ -5,7 +5,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
   const refreshToken = url.searchParams.get("refresh_token") || "";
-  const redirect = url.searchParams.get("redirect") || "/ticket";
+  const redirect = url.searchParams.get("redirect") || "/my-tickets";
 
   if (!token) {
     return NextResponse.redirect(
