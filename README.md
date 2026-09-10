@@ -46,4 +46,5 @@ Questa base serve a:
 2. standardizzare i ticket esistenti secondo il template;
 3. scaffoldare la web app in `app/`;
 4. aggiungere script di indicizzazione e ricerca in `scripts/`;
-5. SSO unificato con SYSEM portal.
+5. SSO unificato con SYSEM portal;
+6. Approvazione admin utenti.
