@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { requireAdmin } from "@/lib/auth";
-import { getTickets } from "@/lib/content";
+import { getTickets } from "@/lib/supabase-data";
+import { createClient } from "@/lib/supabase-server";
 
 const statusLabels: Record<string, string> = {
   in_analisi: "In analisi",
@@ -8,12 +8,29 @@ const statusLabels: Record<string, string> = {
   in_attesa_cliente: "In attesa cliente",
   escalato: "Escalato",
   risolto: "Risolto",
-  chiuso: "Chiuso"
+  chiuso: "Chiuso",
+  aperto: "Aperto",
+  in_lavorazione: "In lavorazione",
+};
+
+const priorityLabels: Record<string, string> = {
+  critica: "Critica",
+  alta: "Alta",
+  media: "Media",
+  bassa: "Bassa",
 };
 
 export default async function TicketPage() {
-  await requireAdmin();
-  const tickets = getTickets();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const tickets = await getTickets();
 
   return (
     <main className="page-shell">
@@ -34,7 +51,7 @@ export default async function TicketPage() {
         </div>
 
         <div className="filter-row">
-          <span className="filter-chip">P1-P2</span>
+          <span className="filter-chip">Critica-Alta</span>
           <span className="filter-chip">In attesa cliente</span>
           <span className="filter-chip">Modbus</span>
           <span className="filter-chip">Cliente</span>
@@ -55,7 +72,7 @@ export default async function TicketPage() {
                 <th>ID</th>
                 <th>Cliente</th>
                 <th>Titolo</th>
-                <th>Priorita</th>
+                <th>Priorità</th>
                 <th>Stato</th>
                 <th>Responsabile</th>
                 <th>Aggiornato</th>
@@ -69,16 +86,16 @@ export default async function TicketPage() {
                       {ticket.id}
                     </Link>
                   </td>
-                  <td>{ticket.cliente}</td>
-                  <td>{ticket.titolo}</td>
+                  <td>{ticket.client}</td>
+                  <td>{ticket.title}</td>
                   <td>
-                    <span className={`priority-badge priority-${ticket.priorita.toLowerCase()}`}>
-                      {ticket.priorita}
+                    <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
+                      {priorityLabels[ticket.priority] || ticket.priority}
                     </span>
                   </td>
-                  <td>{statusLabels[ticket.stato] ?? ticket.stato}</td>
-                  <td>{ticket.responsabile}</td>
-                  <td>{ticket.ultimo_aggiornamento}</td>
+                  <td>{statusLabels[ticket.status] ?? ticket.status}</td>
+                  <td>{ticket.assignee}</td>
+                  <td>{ticket.updated_at}</td>
                 </tr>
               ))}
             </tbody>

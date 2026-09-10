@@ -1,19 +1,22 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SupabaseProvider from "@/components/supabase-provider";
 
 export const metadata: Metadata = {
   title: "SF Service Portal",
-  description: "Portale assistenza tecnica"
+  description: "Portale assistenza tecnica",
 };
 
 export default function RootLayout({
-  children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="it">
-      <body>{children}</body>
+      <body>
+        <SupabaseProvider>{children}</SupabaseProvider>
+      </body>
     </html>
   );
 }

@@ -1,10 +1,18 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
-import { getProcedureDocuments } from "@/lib/content";
+import { getProcedureDocuments } from "@/lib/supabase-data";
+import { createClient } from "@/lib/supabase-server";
 
 export default async function ProcedurePage() {
-  await requireUser();
-  const procedures = getProcedureDocuments();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const procedures = await getProcedureDocuments();
 
   return (
     <main className="page-shell">
@@ -29,27 +37,27 @@ export default async function ProcedurePage() {
           {procedures.map((item) => (
             <article key={item.slug} className="document-card">
               <div className="document-meta">
-                <span className="document-type">{item.tipo_documento}</span>
-                <span>{item.data_aggiornamento}</span>
+                <span className="document-type">{item.doc_type}</span>
+                <span>{item.updated_at}</span>
               </div>
-              <h3>{item.titolo}</h3>
-              <p>{item.riassunto}</p>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
               <dl className="document-details">
                 <div>
                   <dt>Prodotto</dt>
-                  <dd>{item.prodotto}</dd>
+                  <dd>{item.product}</dd>
                 </div>
                 <div>
                   <dt>Versione</dt>
-                  <dd>{item.versione}</dd>
+                  <dd>{item.version}</dd>
                 </div>
                 <div>
                   <dt>Ambito</dt>
-                  <dd>{item.ambito}</dd>
+                  <dd>{item.scope}</dd>
                 </div>
                 <div>
                   <dt>Lingua</dt>
-                  <dd>{item.lingua || "n/a"}</dd>
+                  <dd>{item.language || "n/a"}</dd>
                 </div>
               </dl>
               <div className="tag-row">

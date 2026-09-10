@@ -1,103 +1,42 @@
-import fs from "node:fs";
-import path from "node:path";
-import crypto from "node:crypto";
-import { createUser, getUserByEmail } from "@/lib/users";
+import { readFileSync, writeFileSync, existsSync } from "fs";
+import { join } from "path";
 
-export type PendingApproval = {
+interface Approval {
   id: string;
   name: string;
   email: string;
-  password: string;
-  createdAt: string;
   status: "pending" | "approved" | "rejected";
-};
+  createdAt: string;
+}
 
-const pendingApprovalsPath = path.join(
-  process.cwd(),
-  "data",
-  "users",
-  "pending-approvals.json"
-);
+const DATA_FILE = join(process.cwd(), "data", "approvals.json");
 
-function ensurePendingStore() {
-  const folder = path.dirname(pendingApprovalsPath);
-
-  if (!fs.existsSync(folder)) {
-    fs.mkdirSync(folder, { recursive: true });
-  }
-
-  if (!fs.existsSync(pendingApprovalsPath)) {
-    fs.writeFileSync(pendingApprovalsPath, "[]\n", "utf8");
+function loadApprovals(): Approval[] {
+  if (!existsSync(DATA_FILE)) return [];
+  try {
+    return JSON.parse(readFileSync(DATA_FILE, "utf-8"));
+  } catch {
+    return [];
   }
 }
 
-function normalizeEmail(email: string) {
-  return email.trim().toLowerCase();
-}
-
-export function getPendingApprovals() {
-  ensurePendingStore();
-  return JSON.parse(
-    fs.readFileSync(pendingApprovalsPath, "utf8")
-  ) as PendingApproval[];
-}
-
-function writePendingApprovals(items: PendingApproval[]) {
-  ensurePendingStore();
-  fs.writeFileSync(
-    pendingApprovalsPath,
-    `${JSON.stringify(items, null, 2)}\n`,
-    "utf8"
-  );
-}
-
-export function createPendingApproval(input: {
-  name: string;
-  email: string;
-  password: string;
-}) {
-  const email = normalizeEmail(input.email);
-  const approvals = getPendingApprovals();
-
-  if (getUserByEmail(email)) {
-    throw new Error("An active user with this email already exists.");
+function saveApprovals(approvals: Approval[]) {
+  const dir = join(process.cwd(), "data");
+  if (!existsSync(dir)) {
+    require("fs").mkdirSync(dir, { recursive: true });
   }
+  writeFileSync(DATA_FILE, JSON.stringify(approvals, null, 2));
+}
 
-  if (approvals.some((item) => item.email === email && item.status === "pending")) {
-    throw new Error("A pending approval request already exists for this email.");
-  }
-
-  const approval: PendingApproval = {
-    id: crypto.randomUUID(),
-    name: input.name.trim(),
-    email,
-    password: input.password,
-    createdAt: new Date().toISOString(),
-    status: "pending"
-  };
-
-  approvals.push(approval);
-  writePendingApprovals(approvals);
-  return approval;
+export function getPendingApprovals(): Approval[] {
+  return loadApprovals();
 }
 
 export function approvePendingApproval(id: string) {
-  const approvals = getPendingApprovals();
-  const approval = approvals.find((item) => item.id === id);
-
-  if (!approval || approval.status !== "pending") {
-    throw new Error("Request not found or already processed.");
+  const approvals = loadApprovals();
+  const idx = approvals.findIndex((a) => a.id === id);
+  if (idx !== -1) {
+    approvals[idx].status = "approved";
+    saveApprovals(approvals);
   }
-
-  const user = createUser({
-    name: approval.name,
-    email: approval.email,
-    password: approval.password,
-    role: "user"
-  });
-
-  approval.status = "approved";
-  writePendingApprovals(approvals);
-
-  return user;
 }

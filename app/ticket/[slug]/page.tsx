@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { requireAdmin } from "@/lib/auth";
-import { getTicketBySlug, getTickets } from "@/lib/content";
+import { getTicketBySlug } from "@/lib/supabase-data";
+import { createClient } from "@/lib/supabase-server";
 
 type TicketDetailPageProps = {
   params: Promise<{
@@ -20,18 +20,20 @@ function renderContent(content: string | undefined) {
     .filter(Boolean);
 }
 
-export function generateStaticParams() {
-  return getTickets().map((ticket) => ({
-    slug: ticket.slug
-  }));
-}
-
 export default async function TicketDetailPage({
-  params
+  params,
 }: TicketDetailPageProps) {
-  await requireAdmin();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
   const { slug } = await params;
-  const ticket = getTicketBySlug(slug);
+  const ticket = await getTicketBySlug(slug);
 
   if (!ticket) {
     notFound();
@@ -44,9 +46,9 @@ export default async function TicketDetailPage({
       <section className="section-intro">
         <div>
           <p className="eyebrow">{ticket.id}</p>
-          <h1 className="section-title">{ticket.titolo}</h1>
+          <h1 className="section-title">{ticket.title}</h1>
           <p className="hero-copy">
-            {ticket.cliente} · {ticket.prodotto} · {ticket.responsabile}
+            {ticket.client} · {ticket.product} · {ticket.assignee}
           </p>
         </div>
 
@@ -64,23 +66,23 @@ export default async function TicketDetailPage({
           <dl className="detail-list">
             <div>
               <dt>Stato</dt>
-              <dd>{ticket.stato}</dd>
+              <dd>{ticket.status}</dd>
             </div>
             <div>
-              <dt>Priorita</dt>
-              <dd>{ticket.priorita}</dd>
+              <dt>Priorità</dt>
+              <dd>{ticket.priority}</dd>
             </div>
             <div>
               <dt>Cliente</dt>
-              <dd>{ticket.cliente}</dd>
+              <dd>{ticket.client}</dd>
             </div>
             <div>
               <dt>Prodotto</dt>
-              <dd>{ticket.prodotto}</dd>
+              <dd>{ticket.product}</dd>
             </div>
             <div>
               <dt>Impianto</dt>
-              <dd>{ticket.impianto || "n/a"}</dd>
+              <dd>{ticket.plant || "n/a"}</dd>
             </div>
             <div>
               <dt>Seriale</dt>
@@ -88,23 +90,23 @@ export default async function TicketDetailPage({
             </div>
             <div>
               <dt>Referente</dt>
-              <dd>{ticket.contatto_cliente || "n/a"}</dd>
+              <dd>{ticket.contact_name || "n/a"}</dd>
             </div>
             <div>
               <dt>Email</dt>
-              <dd>{ticket.email_cliente || "n/a"}</dd>
+              <dd>{ticket.contact_email || "n/a"}</dd>
             </div>
             <div>
               <dt>Aperto</dt>
-              <dd>{ticket.data_apertura}</dd>
+              <dd>{ticket.created_at}</dd>
             </div>
             <div>
               <dt>Aggiornato</dt>
-              <dd>{ticket.ultimo_aggiornamento}</dd>
+              <dd>{ticket.updated_at}</dd>
             </div>
             <div>
               <dt>SLA</dt>
-              <dd>{ticket.scadenza_sla || "n/d"}</dd>
+              <dd>{ticket.sla_deadline || "n/d"}</dd>
             </div>
           </dl>
         </article>

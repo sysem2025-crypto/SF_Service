@@ -1,15 +1,22 @@
 import Link from "next/link";
-import { getDashboardData } from "@/lib/content";
+import { getDashboardData } from "@/lib/supabase-data";
 
 const priorityLabels = {
-  P1: "Critica",
-  P2: "Alta",
-  P3: "Media",
-  P4: "Bassa"
+  critica: "Critica",
+  alta: "Alta",
+  media: "Media",
+  bassa: "Bassa",
 } as const;
 
-export function AdminDashboard() {
-  const dashboard = getDashboardData();
+const statusLabels = {
+  aperto: "Aperto",
+  in_lavorazione: "In lavorazione",
+  chiuso: "Chiuso",
+  rifiutato: "Rifiutato",
+} as const;
+
+export async function AdminDashboard() {
+  const dashboard = await getDashboardData();
 
   return (
     <main className="page-shell">
@@ -62,7 +69,7 @@ export function AdminDashboard() {
           <span>Escalation</span>
           <strong>
             {
-              dashboard.openTickets.filter((ticket) => ticket.stato === "escalato")
+              dashboard.openTickets.filter((ticket) => ticket.status === "escalato")
                 .length
             }
           </strong>
@@ -78,7 +85,7 @@ export function AdminDashboard() {
           <div className="priority-columns">
             {Object.entries(priorityLabels).map(([priority, label]) => {
               const items = dashboard.openTickets.filter(
-                (ticket) => ticket.priorita === priority
+                (ticket) => ticket.priority === priority
               );
 
               return (
@@ -95,11 +102,11 @@ export function AdminDashboard() {
                             <strong>
                               <Link href={`/ticket/${ticket.slug}`}>{ticket.id}</Link>
                             </strong>
-                            <p>{ticket.titolo}</p>
+                            <p>{ticket.title}</p>
                           </div>
                           <div className="ticket-meta">
-                            <span>{ticket.cliente}</span>
-                            <span>{ticket.stato}</span>
+                            <span>{ticket.client}</span>
+                            <span>{statusLabels[ticket.status as keyof typeof statusLabels] || ticket.status}</span>
                           </div>
                         </li>
                       ))
@@ -124,12 +131,12 @@ export function AdminDashboard() {
                 <div>
                   <strong>
                     <Link href={`/ticket/${ticket.slug}`}>
-                      {ticket.id} · {ticket.cliente}
+                      {ticket.id} · {ticket.client}
                     </Link>
                   </strong>
-                  <p>{ticket.titolo}</p>
+                  <p>{ticket.title}</p>
                 </div>
-                <span>{ticket.scadenza_sla || "SLA n/d"}</span>
+                <span>{ticket.sla_deadline || "SLA n/d"}</span>
               </li>
             ))}
             {!dashboard.slaAtRisk.length && (
@@ -145,12 +152,12 @@ export function AdminDashboard() {
 
           <ul className="stack-list">
             {dashboard.clients.map((client) => (
-              <li key={client.cliente} className="client-item">
+              <li key={client.client} className="client-item">
                 <div>
-                  <strong>{client.cliente}</strong>
-                  <p>{client.referente_principale || "Contatto n/d"}</p>
+                  <strong>{client.client}</strong>
+                  <p>{client.main_contact || "Contatto n/d"}</p>
                 </div>
-                <span>{client.paese || "Paese n/d"}</span>
+                <span>{client.country || "Paese n/d"}</span>
               </li>
             ))}
           </ul>
@@ -168,9 +175,9 @@ export function AdminDashboard() {
                   <strong>
                     <Link href={`/ticket/${ticket.slug}`}>{ticket.id}</Link>
                   </strong>
-                  <p>{ticket.titolo}</p>
+                  <p>{ticket.title}</p>
                 </div>
-                <span>{ticket.ultimo_aggiornamento}</span>
+                <span>{ticket.updated_at}</span>
               </li>
             ))}
           </ul>

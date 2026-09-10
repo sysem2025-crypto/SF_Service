@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { requireUser } from "@/lib/auth";
-import { getTicketsByCreatorEmail } from "@/lib/content";
+import { getTicketsByCreatorEmail } from "@/lib/supabase-data";
+import { createClient } from "@/lib/supabase-server";
 
 const statusLabels: Record<string, string> = {
   in_analisi: "In analisi",
@@ -8,12 +8,29 @@ const statusLabels: Record<string, string> = {
   in_attesa_cliente: "In attesa cliente",
   escalato: "Escalato",
   risolto: "Risolto",
-  chiuso: "Chiuso"
+  chiuso: "Chiuso",
+  aperto: "Aperto",
+  in_lavorazione: "In lavorazione",
+};
+
+const priorityLabels: Record<string, string> = {
+  critica: "Critica",
+  alta: "Alta",
+  media: "Media",
+  bassa: "Bassa",
 };
 
 export default async function MyTicketsPage() {
-  const user = await requireUser();
-  const tickets = getTicketsByCreatorEmail(user.email, true);
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  const tickets = await getTicketsByCreatorEmail(user.email!, true);
 
   return (
     <main className="page-shell">
@@ -42,7 +59,7 @@ export default async function MyTicketsPage() {
                   <th>ID</th>
                   <th>Cliente</th>
                   <th>Titolo</th>
-                  <th>Priorita</th>
+                  <th>Priorità</th>
                   <th>Stato</th>
                   <th>Aperto</th>
                 </tr>
@@ -50,16 +67,20 @@ export default async function MyTicketsPage() {
               <tbody>
                 {tickets.map((ticket) => (
                   <tr key={ticket.slug}>
-                    <td>{ticket.id}</td>
-                    <td>{ticket.cliente}</td>
-                    <td>{ticket.titolo}</td>
                     <td>
-                      <span className={`priority-badge priority-${ticket.priorita.toLowerCase()}`}>
-                        {ticket.priorita}
+                      <Link href={`/ticket/${ticket.slug}`} className="text-link">
+                        {ticket.id}
+                      </Link>
+                    </td>
+                    <td>{ticket.client}</td>
+                    <td>{ticket.title}</td>
+                    <td>
+                      <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
+                        {priorityLabels[ticket.priority] || ticket.priority}
                       </span>
                     </td>
-                    <td>{statusLabels[ticket.stato] ?? ticket.stato}</td>
-                    <td>{ticket.data_apertura}</td>
+                    <td>{statusLabels[ticket.status] ?? ticket.status}</td>
+                    <td>{ticket.created_at}</td>
                   </tr>
                 ))}
               </tbody>
