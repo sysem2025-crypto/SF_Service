@@ -22,6 +22,26 @@ create policy "Users can update own profile"
   on public.profiles for update
   using (auth.uid() = id);
 
+-- Policy: admin aggiorna qualsiasi profilo
+create policy "Admin can update any profile"
+  on public.profiles for update
+  using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
+-- Policy: admin vede tutti i profili
+create policy "Admin can view all profiles"
+  on public.profiles for select
+  using (
+    exists (
+      select 1 from public.profiles
+      where id = auth.uid() and role = 'admin'
+    )
+  );
+
 -- Trigger per creare profilo automaticamente alla registrazione
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = '' as $$
