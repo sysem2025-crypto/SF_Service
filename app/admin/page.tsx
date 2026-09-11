@@ -1,48 +1,37 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase";
 
 export default function AdminPage() {
-  const [msg, setMsg] = useState("loading...");
-  const [tickets, setTickets] = useState<unknown[]>([]);
+  const [msg, setMsg] = useState("mounted");
 
   useEffect(() => {
-    console.log("[Admin] mounted");
+    console.log("[Admin] page mounted");
     const supabase = createClient();
 
     supabase.auth.getUser().then(({ data, error }) => {
-      console.log("[Admin] getUser:", data?.user?.id, error?.message);
+      console.log("[Admin] user:", data?.user?.id ?? "null", "error:", error?.message ?? "none");
       if (!data?.user) {
-        setMsg("Non autenticato");
+        setMsg("NO USER - non autenticato");
         return;
       }
 
-      supabase.from("tickets").select("*").order("updated_at", { ascending: false }).then(({ data: t, error: e }) => {
-        console.log("[Admin] tickets:", t?.length, e?.message);
-        if (e) {
-          setMsg("Errore tickets: " + e.message);
-        } else {
-          setTickets(t || []);
-          setMsg("OK - " + (t?.length || 0) + " tickets");
-        }
+      supabase.from("tickets").select("*").then(({ data: t, error: e }) => {
+        console.log("[Admin] tickets:", t?.length ?? "null", "error:", e?.message ?? "none");
+        setMsg("OK user=" + data.user.email + " tickets=" + (t?.length ?? 0));
       });
+    }).catch((e) => {
+      console.error("[Admin] catch:", e);
+      setMsg("CATCH: " + String(e));
     });
   }, []);
 
   return (
-    <main className="page-shell">
+    <main style={{ padding: 40 }}>
+      <h1>Admin Debug</h1>
       <p>{msg}</p>
-      {tickets.length === 0 && <p>Nessun ticket</p>}
-      <ul>
-        {(tickets as {id: string; title: string}[]).map(t => (
-          <li key={t.id}>{t.id} - {t.title}</li>
-        ))}
-      </ul>
-      <form action="/api/auth/logout" method="post">
-        <button type="submit">Logout</button>
-      </form>
+      <p>Apri Console (F12) per i log completi.</p>
     </main>
   );
 }
