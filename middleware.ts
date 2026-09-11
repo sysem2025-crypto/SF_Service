@@ -1,10 +1,8 @@
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({
-    request,
-  });
+  let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,9 +16,7 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value, options }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({
-            request,
-          });
+          supabaseResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
           );
@@ -34,6 +30,7 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const ssoToken = request.cookies.get("sso_access_token")?.value;
+  let ssoBootstrapped = false;
 
   if (!user && ssoToken) {
     const ssoRefresh = request.cookies.get("sso_refresh_token")?.value || "";
@@ -43,10 +40,19 @@ export async function middleware(request: NextRequest) {
     });
     if (ssoData?.session?.user) {
       user = ssoData.session.user;
+      ssoBootstrapped = true;
     }
   }
 
   const path = request.nextUrl.pathname;
+
+  if (ssoBootstrapped) {
+    const redirectResponse = NextResponse.redirect(new URL(path + request.nextUrl.search, request.url));
+    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) => {
+      redirectResponse.cookies.set(name, value, options as Record<string, unknown>);
+    });
+    return redirectResponse;
+  }
 
   const protectedPaths = ["/ticket", "/my-tickets", "/procedure", "/firmware-software", "/admin"];
   const isProtected = protectedPaths.some((p) => path.startsWith(p));
