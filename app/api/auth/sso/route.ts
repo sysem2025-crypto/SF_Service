@@ -26,15 +26,19 @@ export async function GET(request: Request) {
 
     const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
 <script>
-document.cookie = "sso_access_token=${token.replace(/'/g, "\\'")}; path=/; max-age=86400; SameSite=Lax";
-document.cookie = "sso_refresh_token=${refreshToken.replace(/'/g, "\\'")}; path=/; max-age=86400; SameSite=Lax";
-document.cookie = "sso_user_email=${user.email.replace(/'/g, "\\'")}; path=/; max-age=86400; SameSite=Lax";
-window.location.href = ${JSON.stringify(redirect)};
+var p = new URLSearchParams(window.location.search);
+var t = p.get("token");
+var r = p.get("refresh_token");
+var d = p.get("redirect") || "/";
+document.cookie = "sso_access_token=" + t + "; path=/; max-age=86400; SameSite=Lax";
+document.cookie = "sso_refresh_token=" + r + "; path=/; max-age=86400; SameSite=Lax";
+document.cookie = "sso_user_email=" + encodeURIComponent("${user.email}") + "; path=/; max-age=86400; SameSite=Lax";
+window.location.href = d;
 </script></body></html>`;
 
     return new Response(html, {
       status: 200,
-      headers: { "Content-Type": "text/html" },
+      headers: { "Content-Type": "text/html; charset=utf-8" },
     });
   } catch (err) {
     console.error("[SSO] Error:", err);
