@@ -13,12 +13,12 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
           supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+          cookiesToSet.forEach(({ name, value }) =>
+            supabaseResponse.cookies.set(name, value)
           );
         },
       },
@@ -30,7 +30,6 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const ssoToken = request.cookies.get("sso_access_token")?.value;
-  let ssoBootstrapped = false;
 
   if (!user && ssoToken) {
     const ssoRefresh = request.cookies.get("sso_refresh_token")?.value || "";
@@ -40,19 +39,10 @@ export async function middleware(request: NextRequest) {
     });
     if (ssoData?.session?.user) {
       user = ssoData.session.user;
-      ssoBootstrapped = true;
     }
   }
 
   const path = request.nextUrl.pathname;
-
-  if (ssoBootstrapped) {
-    const redirectResponse = NextResponse.redirect(new URL(path + request.nextUrl.search, request.url));
-    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
-      redirectResponse.cookies.set(name, value);
-    });
-    return redirectResponse;
-  }
 
   const protectedPaths = ["/ticket", "/my-tickets", "/procedure", "/firmware-software", "/admin"];
   const isProtected = protectedPaths.some((p) => path.startsWith(p));
