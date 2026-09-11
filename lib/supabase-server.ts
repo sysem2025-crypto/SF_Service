@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 export async function createClient() {
   const cookieStore = await cookies();
 
-  return createServerClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -24,4 +24,18 @@ export async function createClient() {
       },
     }
   );
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    const ssoToken = cookieStore.get("sso_access_token")?.value;
+    const ssoRefresh = cookieStore.get("sso_refresh_token")?.value || "";
+    if (ssoToken) {
+      await supabase.auth.setSession({
+        access_token: ssoToken,
+        refresh_token: ssoRefresh,
+      });
+    }
+  }
+
+  return supabase;
 }
