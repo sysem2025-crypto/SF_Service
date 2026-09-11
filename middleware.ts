@@ -67,7 +67,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isAuthPage && user) {
+  if (isAuthPage && user && request.nextUrl.searchParams.get("error") !== "admin-required") {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/";
     return NextResponse.redirect(redirectUrl);
@@ -80,7 +80,11 @@ export async function middleware(request: NextRequest) {
       .eq("id", user.id)
       .single();
     if (!profile || profile.role !== "admin") {
-      return NextResponse.redirect(new URL("/", request.url));
+      const redirectUrl = request.nextUrl.clone();
+      redirectUrl.pathname = "/login";
+      redirectUrl.searchParams.set("error", "admin-required");
+      redirectUrl.searchParams.set("redirect", path);
+      return NextResponse.redirect(redirectUrl);
     }
   }
 
