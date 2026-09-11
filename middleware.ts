@@ -5,6 +5,16 @@ function normalizeRole(role: unknown) {
   return String(role || "").trim().toLowerCase();
 }
 
+function isConfiguredAdminEmail(email: unknown) {
+  const configured = process.env.ADMIN_EMAILS || "gianluca.piga@sysem.it";
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  return configured
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(normalizedEmail);
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -84,7 +94,7 @@ export async function middleware(request: NextRequest) {
       .eq("id", user.id)
       .single();
     const role = normalizeRole(profile?.role || user.app_metadata?.role || user.user_metadata?.role);
-    if (role !== "admin") {
+    if (role !== "admin" && !isConfiguredAdminEmail(user.email)) {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/login";
       redirectUrl.searchParams.set("error", "admin-required");

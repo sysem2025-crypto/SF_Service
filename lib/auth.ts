@@ -16,6 +16,16 @@ function metadataRole(user: { app_metadata?: Record<string, unknown>; user_metad
   return normalizeRole(user.app_metadata?.role || user.user_metadata?.role);
 }
 
+function isConfiguredAdminEmail(email: unknown) {
+  const configured = process.env.ADMIN_EMAILS || "gianluca.piga@sysem.it";
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  return configured
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean)
+    .includes(normalizedEmail);
+}
+
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -31,7 +41,9 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   return {
     id: user.id,
     email: user.email ?? "",
-    role: normalizeRole(profile?.role) || metadataRole(user) || "user",
+    role: isConfiguredAdminEmail(user.email)
+      ? "admin"
+      : normalizeRole(profile?.role) || metadataRole(user) || "user",
     full_name: profile?.full_name ?? null,
   };
 }
