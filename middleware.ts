@@ -48,8 +48,8 @@ export async function middleware(request: NextRequest) {
 
   if (ssoBootstrapped) {
     const redirectResponse = NextResponse.redirect(new URL(path + request.nextUrl.search, request.url));
-    supabaseResponse.cookies.getAll().forEach(({ name, value, options }) => {
-      redirectResponse.cookies.set(name, value, options as Record<string, unknown>);
+    supabaseResponse.cookies.getAll().forEach(({ name, value }) => {
+      redirectResponse.cookies.set(name, value);
     });
     return redirectResponse;
   }
