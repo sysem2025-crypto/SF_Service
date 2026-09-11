@@ -36,7 +36,11 @@ export async function middleware(request: NextRequest) {
   const ssoToken = request.cookies.get("sso_access_token")?.value;
 
   if (!user && ssoToken) {
-    const { data: { user: ssoUser } } = await supabase.auth.getUser(ssoToken);
+    const ssoRefresh = request.cookies.get("sso_refresh_token")?.value || "";
+    const { data: { user: ssoUser } } = await supabase.auth.setSession({
+      access_token: ssoToken,
+      refresh_token: ssoRefresh,
+    });
     if (ssoUser) {
       user = ssoUser;
     }
