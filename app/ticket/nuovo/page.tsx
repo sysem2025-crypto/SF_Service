@@ -45,6 +45,7 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
     const { error: insertError, data } = await supabase
       .from("tickets")
       .insert({
+        user_id: user.id,
         title,
         client,
         description,

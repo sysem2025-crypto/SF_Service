@@ -284,6 +284,7 @@ export async function createTicket(input: {
   const { data, error } = await supabase
     .from("tickets")
     .insert({
+      user_id: user.id,
       title: input.title,
       client: input.client,
       description: input.description,
