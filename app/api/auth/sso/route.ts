@@ -15,9 +15,36 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createClient();
-    const { data: { user }, error } = await supabase.auth.getUser(token);
+
+    let { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user || !user.email) {
+      console.log("[SSO] getUser failed:", error?.message || "no user", "trying refresh_token...");
+      if (refreshToken) {
+        const { data: refreshData, error: refreshError } = await supabase.auth.setSession({
+          access_token: token,
+          refresh_token: refreshToken,
+        });
+        if (!refreshError && refreshData?.user?.email) {
+          user = refreshData.user;
+          const newToken = refreshData.session?.access_token || token;
+          const newRefresh = refreshData.session?.refresh_token || refreshToken;
+          const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<script>
+var t = ${JSON.stringify(newToken)};
+var r = ${JSON.stringify(newRefresh)};
+document.cookie = "sso_access_token=" + t + "; path=/; max-age=86400; SameSite=Lax";
+document.cookie = "sso_refresh_token=" + r + "; path=/; max-age=86400; SameSite=Lax";
+document.cookie = "sso_user_email=" + encodeURIComponent(${JSON.stringify(user.email)}) + "; path=/; max-age=86400; SameSite=Lax";
+window.location.href = ${JSON.stringify(redirect)};
+</script></body></html>`;
+          return new Response(html, {
+            status: 200,
+            headers: { "Content-Type": "text/html; charset=utf-8" },
+          });
+        }
+        console.log("[SSO] Refresh also failed:", refreshError?.message || "unknown");
+      }
       return new Response(null, {
         status: 302,
         headers: { Location: "/login?error=invalid-token" },
