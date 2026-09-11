@@ -1,67 +1,46 @@
-import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
   const refreshToken = url.searchParams.get("refresh_token") || "";
-  const defaultRedirect = url.searchParams.get("redirect") || "/";
+  const redirect = url.searchParams.get("redirect") || "/";
 
   if (!token) {
-    return NextResponse.redirect(
-      new URL(`/login?error=no-token&redirect=${encodeURIComponent(defaultRedirect)}`, request.url),
-      303
-    );
+    return new Response(null, {
+      status: 302,
+      headers: { Location: "/login?error=no-token" },
+    });
   }
 
   try {
     const supabase = await createClient();
-
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user || !user.email) {
-      return NextResponse.redirect(
-        new URL(`/login?error=invalid-token&redirect=${encodeURIComponent(defaultRedirect)}`, request.url),
-        303
-      );
-    }
-
-    const redirect = defaultRedirect;
-
-    const response = NextResponse.redirect(new URL(redirect, request.url), 303);
-
-    response.cookies.set("sso_access_token", token, {
-      httpOnly: false,
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24,
-    });
-
-    if (refreshToken) {
-      response.cookies.set("sso_refresh_token", refreshToken, {
-        httpOnly: false,
-        secure: false,
-        sameSite: "lax",
-        path: "/",
-        maxAge: 60 * 60 * 24,
+      return new Response(null, {
+        status: 302,
+        headers: { Location: "/login?error=invalid-token" },
       });
     }
 
-    response.cookies.set("sso_user_email", user.email, {
-      httpOnly: false,
-      secure: false,
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24,
-    });
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<script>
+document.cookie = "sso_access_token=${token.replace(/'/g, "\\'")}; path=/; max-age=86400; SameSite=Lax";
+document.cookie = "sso_refresh_token=${refreshToken.replace(/'/g, "\\'")}; path=/; max-age=86400; SameSite=Lax";
+document.cookie = "sso_user_email=${user.email.replace(/'/g, "\\'")}; path=/; max-age=86400; SameSite=Lax";
+window.location.href = ${JSON.stringify(redirect)};
+</script></body></html>`;
 
-    return response;
+    return new Response(html, {
+      status: 200,
+      headers: { "Content-Type": "text/html" },
+    });
   } catch (err) {
     console.error("[SSO] Error:", err);
-    return NextResponse.redirect(
-      new URL(`/login?error=session-error&redirect=${encodeURIComponent(defaultRedirect)}`, request.url),
-      303
-    );
+    return new Response(null, {
+      status: 302,
+      headers: { Location: "/login?error=session-error" },
+    });
   }
 }
