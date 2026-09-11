@@ -21,7 +21,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     document.cookie.split(";").forEach(function (c) {
       document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
     });
-    window.location.href = "/";
+    window.location.href = "https://sysem.it";
   }
 
   return (
