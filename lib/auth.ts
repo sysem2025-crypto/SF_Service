@@ -8,6 +8,14 @@ export interface AuthUser {
   full_name: string | null;
 }
 
+function normalizeRole(role: unknown) {
+  return String(role || "").trim().toLowerCase();
+}
+
+function metadataRole(user: { app_metadata?: Record<string, unknown>; user_metadata?: Record<string, unknown> }) {
+  return normalizeRole(user.app_metadata?.role || user.user_metadata?.role);
+}
+
 export async function getCurrentUser(): Promise<AuthUser | null> {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -23,7 +31,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
   return {
     id: user.id,
     email: user.email ?? "",
-    role: profile?.role ?? "user",
+    role: normalizeRole(profile?.role) || metadataRole(user) || "user",
     full_name: profile?.full_name ?? null,
   };
 }

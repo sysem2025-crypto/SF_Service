@@ -1,6 +1,10 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+function normalizeRole(role: unknown) {
+  return String(role || "").trim().toLowerCase();
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
@@ -79,7 +83,8 @@ export async function middleware(request: NextRequest) {
       .select("role")
       .eq("id", user.id)
       .single();
-    if (!profile || profile.role !== "admin") {
+    const role = normalizeRole(profile?.role || user.app_metadata?.role || user.user_metadata?.role);
+    if (role !== "admin") {
       const redirectUrl = request.nextUrl.clone();
       redirectUrl.pathname = "/login";
       redirectUrl.searchParams.set("error", "admin-required");
