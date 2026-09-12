@@ -253,8 +253,8 @@ export default async function TicketDetailPage({
         </div>
       </section>
 
-      <section className="ticket-workspace">
-        <article className="surface ticket-content">
+      <section className="surface ticket-console">
+        <article className="ticket-content">
           <div className="section-heading">
             <h2>Contenuto</h2>
           </div>
@@ -280,123 +280,121 @@ export default async function TicketDetailPage({
           </div>
         </article>
 
-        <aside className="ticket-side-column">
-          <section className="surface ticket-summary">
+        <section className="ticket-summary">
+          <div className="section-heading ticket-panel-heading">
+            <h2>Dati ticket</h2>
+          </div>
+          <TicketInfo ticket={ticket} contact={contact} email={email} />
+        </section>
+
+        {manageable ? (
+          <section className="ticket-operations">
             <div className="section-heading ticket-panel-heading">
-              <h2>Dati ticket</h2>
+              <h2>Gestione</h2>
             </div>
-            <TicketInfo ticket={ticket} contact={contact} email={email} />
-          </section>
 
-          {manageable ? (
-            <section className="surface ticket-operations">
-              <div className="section-heading ticket-panel-heading">
-                <h2>Gestione</h2>
-              </div>
+            <form action={updateTicketAction} className="ticket-edit-form">
+              <label>
+                Stato
+                <select name="status" defaultValue={ticket.status}>
+                  <option value="aperto">Aperto</option>
+                  <option value="in_lavorazione">In lavorazione</option>
+                  <option value="chiuso">Chiuso</option>
+                  <option value="rifiutato">Rifiutato</option>
+                </select>
+              </label>
 
-              <form action={updateTicketAction} className="ticket-edit-form">
-                <label>
-                  Stato
-                  <select name="status" defaultValue={ticket.status}>
-                    <option value="aperto">Aperto</option>
-                    <option value="in_lavorazione">In lavorazione</option>
-                    <option value="chiuso">Chiuso</option>
-                    <option value="rifiutato">Rifiutato</option>
-                  </select>
-                </label>
+              <label>
+                Priorità
+                <select name="priority" defaultValue={ticket.priority}>
+                  <option value="bassa">Bassa</option>
+                  <option value="media">Media</option>
+                  <option value="alta">Alta</option>
+                  <option value="critica">Critica</option>
+                </select>
+              </label>
 
-                <label>
-                  Priorità
-                  <select name="priority" defaultValue={ticket.priority}>
-                    <option value="bassa">Bassa</option>
-                    <option value="media">Media</option>
-                    <option value="alta">Alta</option>
-                    <option value="critica">Critica</option>
-                  </select>
-                </label>
+              <label>
+                Assegnato a
+                <input name="assignee" defaultValue={ticket.assignee} />
+              </label>
 
-                <label>
-                  Assegnato a
-                  <input name="assignee" defaultValue={ticket.assignee} />
-                </label>
+              <label>
+                SLA
+                <input
+                  name="sla_deadline"
+                  type="datetime-local"
+                  defaultValue={formatDateInput(ticket.sla_deadline)}
+                />
+              </label>
 
-                <label>
-                  SLA
-                  <input
-                    name="sla_deadline"
-                    type="datetime-local"
-                    defaultValue={formatDateInput(ticket.sla_deadline)}
-                  />
-                </label>
+              <label>
+                Cliente
+                <input name="client" defaultValue={ticket.client} />
+              </label>
 
-                <label>
-                  Cliente
-                  <input name="client" defaultValue={ticket.client} />
-                </label>
+              <label>
+                Prodotto
+                <input name="product" defaultValue={ticket.product} />
+              </label>
 
-                <label>
-                  Prodotto
-                  <input name="product" defaultValue={ticket.product} />
-                </label>
+              <label>
+                Impianto
+                <input name="plant" defaultValue={ticket.plant || ""} />
+              </label>
 
-                <label>
-                  Impianto
-                  <input name="plant" defaultValue={ticket.plant || ""} />
-                </label>
+              <label>
+                Seriale
+                <input name="serial_number" defaultValue={ticket.serial_number || ""} />
+              </label>
 
-                <label>
-                  Seriale
-                  <input name="serial_number" defaultValue={ticket.serial_number || ""} />
-                </label>
+              <label>
+                Referente
+                <input name="contact_name" defaultValue={ticket.contact_name || ""} />
+              </label>
 
-                <label>
-                  Referente
-                  <input name="contact_name" defaultValue={ticket.contact_name || ""} />
-                </label>
+              <label>
+                Email referente
+                <input name="contact_email" type="email" defaultValue={ticket.contact_email || ""} />
+              </label>
 
-                <label>
-                  Email referente
-                  <input name="contact_email" type="email" defaultValue={ticket.contact_email || ""} />
-                </label>
+              <label className="ticket-edit-wide">
+                Contenuto
+                <textarea name="description" rows={4} defaultValue={ticket.content || ""} />
+              </label>
 
-                <label className="ticket-edit-wide">
-                  Contenuto
-                  <textarea name="description" rows={5} defaultValue={ticket.content || ""} />
-                </label>
-
-                <div className="ticket-operation-actions">
-                  <button type="submit" className="primary-link">
-                    Salva
-                  </button>
-                </div>
-              </form>
-
-              <form action={closeTicketAction} className="ticket-close-form">
-                <label>
-                  Nota chiusura
-                  <textarea
-                    name="close_note"
-                    rows={3}
-                    placeholder="Esito intervento o note per lo storico."
-                  />
-                </label>
-                <button type="submit" className="danger-link">
-                  Chiudi ticket
+              <div className="ticket-operation-actions">
+                <button type="submit" className="primary-link">
+                  Salva
                 </button>
-              </form>
-            </section>
-          ) : (
-            <section className="surface ticket-operations ticket-operations-readonly">
-              <div className="section-heading ticket-panel-heading">
-                <h2>Chiusura</h2>
-                <p>La chiusura può essere dichiarata dall'amministrazione o da chi ha in carico il ticket.</p>
               </div>
-              <dl className="detail-list">
-                <Field label="Chiuso" value={ticket.closed_at ? formatDate(ticket.closed_at) : "Non chiuso"} />
-              </dl>
-            </section>
-          )}
-        </aside>
+            </form>
+
+            <form action={closeTicketAction} className="ticket-close-form">
+              <label>
+                Nota chiusura
+                <textarea
+                  name="close_note"
+                  rows={2}
+                  placeholder="Esito intervento o note per lo storico."
+                />
+              </label>
+              <button type="submit" className="danger-link">
+                Chiudi ticket
+              </button>
+            </form>
+          </section>
+        ) : (
+          <section className="ticket-operations ticket-operations-readonly">
+            <div className="section-heading ticket-panel-heading">
+              <h2>Chiusura</h2>
+              <p>La chiusura può essere dichiarata dall'amministrazione o da chi ha in carico il ticket.</p>
+            </div>
+            <dl className="detail-list">
+              <Field label="Chiuso" value={ticket.closed_at ? formatDate(ticket.closed_at) : "Non chiuso"} />
+            </dl>
+          </section>
+        )}
       </section>
     </main>
   );

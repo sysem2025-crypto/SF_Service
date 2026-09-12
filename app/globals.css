@@ -54,9 +54,9 @@ button {
 }
 
 .ticket-page-shell {
-  width: min(1360px, calc(100% - 28px));
-  padding-top: 18px;
-  padding-bottom: 36px;
+  width: min(1460px, calc(100% - 24px));
+  padding-top: 14px;
+  padding-bottom: 28px;
 }
 
 .portal-hero,
@@ -433,8 +433,8 @@ button {
 }
 
 .ticket-detail-hero {
-  margin: 0 0 12px;
-  padding-bottom: 10px;
+  margin: 0 0 10px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -464,9 +464,9 @@ button {
 
 .ticket-detail-title-row .section-title {
   margin-top: 0;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   max-width: 34ch;
-  font-size: clamp(1.7rem, 2.35vw, 2.25rem);
+  font-size: clamp(1.55rem, 2vw, 2rem);
   line-height: 1.03;
 }
 
@@ -487,25 +487,28 @@ button {
   text-transform: uppercase;
 }
 
-.ticket-workspace {
+.ticket-console {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 470px;
+  grid-template-columns: minmax(320px, 1fr) 330px 420px;
   align-items: start;
-  gap: 12px;
+  gap: 0;
 }
 
-.ticket-side-column {
-  display: grid;
-  gap: 10px;
-}
-
-.ticket-summary,
-.ticket-content {
+.ticket-console {
   box-shadow: 0 10px 26px rgba(21, 48, 51, 0.055);
 }
 
 .ticket-page-shell .surface {
-  padding: 16px;
+  padding: 12px;
+}
+
+.ticket-console > * {
+  min-width: 0;
+  padding: 4px 12px;
+}
+
+.ticket-console > * + * {
+  border-left: 1px solid var(--line);
 }
 
 .ticket-summary {
@@ -514,16 +517,16 @@ button {
 }
 
 .ticket-panel-heading {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .ticket-panel-heading h2,
 .ticket-content .section-heading h2 {
-  font-size: 1.08rem;
+  font-size: 1rem;
 }
 
 .ticket-content {
-  min-height: 260px;
+  min-height: 0;
 }
 
 .ticket-operations {
@@ -533,7 +536,7 @@ button {
 .ticket-edit-form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  gap: 6px 8px;
 }
 
 .ticket-edit-form label,
@@ -541,7 +544,7 @@ button {
   display: grid;
   gap: 4px;
   color: var(--text);
-  font-size: 0.76rem;
+  font-size: 0.72rem;
   font-weight: 700;
 }
 
@@ -551,12 +554,12 @@ button {
 .ticket-close-form textarea {
   width: 100%;
   min-width: 0;
-  padding: 7px 9px;
+  padding: 6px 8px;
   border: 1px solid var(--line);
   border-radius: 4px;
   background: #ffffff;
   color: var(--text);
-  font-size: 0.84rem;
+  font-size: 0.82rem;
 }
 
 .ticket-edit-form textarea,
@@ -584,14 +587,14 @@ button {
 }
 
 .ticket-operation-actions .primary-link {
-  padding: 9px 12px;
+  padding: 8px 11px;
 }
 
 .ticket-close-form {
   display: grid;
-  gap: 8px;
-  margin-top: 10px;
-  padding-top: 10px;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
   border-top: 1px solid var(--line);
 }
 
@@ -601,7 +604,7 @@ button {
   justify-content: center;
   justify-self: start;
   gap: 8px;
-  padding: 9px 12px;
+  padding: 8px 11px;
   border: 0;
   border-radius: 4px;
   background: var(--danger-bg);
@@ -615,7 +618,7 @@ button {
 }
 
 .ticket-operations-readonly {
-  max-width: 720px;
+  max-width: none;
 }
 
 .detail-list {
@@ -627,20 +630,20 @@ button {
 
 .detail-field {
   display: grid;
-  grid-template-columns: minmax(78px, 0.34fr) minmax(0, 1fr);
-  gap: 8px;
-  padding: 6px 0;
+  grid-template-columns: minmax(72px, 0.32fr) minmax(0, 1fr);
+  gap: 6px;
+  padding: 5px 0;
   border-top: 1px solid var(--line);
 }
 
 .detail-list dt {
   color: var(--muted);
-  font-size: 0.74rem;
+  font-size: 0.7rem;
 }
 
 .detail-list dd {
   margin: 0;
-  font-size: 0.84rem;
+  font-size: 0.8rem;
   font-weight: 800;
   overflow-wrap: anywhere;
   text-align: right;
@@ -648,20 +651,20 @@ button {
 
 .markdown-body {
   display: grid;
-  gap: 8px;
-  max-width: 88ch;
+  gap: 6px;
+  max-width: none;
 }
 
 .markdown-body h3 {
-  margin: 8px 0 0;
-  font-size: 1.15rem;
+  margin: 4px 0 0;
+  font-size: 1rem;
 }
 
 .markdown-body p,
 .markdown-body li {
   margin: 0;
-  font-size: 0.96rem;
-  line-height: 1.55;
+  font-size: 0.9rem;
+  line-height: 1.45;
   color: var(--text);
 }
 
@@ -899,10 +902,19 @@ button {
 
   .section-intro,
   .ticket-detail-title-row,
-  .ticket-workspace,
+  .ticket-console,
   .detail-grid {
     grid-template-columns: 1fr;
     display: grid;
+  }
+
+  .ticket-console > * {
+    padding: 10px 0;
+  }
+
+  .ticket-console > * + * {
+    border-left: 0;
+    border-top: 1px solid var(--line);
   }
 
   .ticket-detail-title-row {
