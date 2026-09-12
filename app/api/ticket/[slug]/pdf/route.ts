@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { getTicketBySlug } from "@/lib/supabase-data";
 import { createClient } from "@/lib/supabase-server";
 
@@ -116,20 +117,68 @@ function buildPdf(lines: PdfLine[]) {
   return Buffer.from(pdf, "binary");
 }
 
-export async function GET(_request: Request, { params }: TicketPdfRouteProps) {
+async function getTicketForPdf(slug: string, canUseUserSession: boolean) {
+  if (canUseUserSession) {
+    const ticket = await getTicketBySlug(slug);
+    if (ticket) return ticket;
+  }
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return null;
+
+  const adminClient = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
+  const { data, error } = await adminClient
+    .from("tickets")
+    .select("*")
+    .eq("id", slug)
+    .single();
+
+  if (error || !data) return null;
+
+  return {
+    id: data.id,
+    slug: data.id,
+    title: data.title,
+    client: data.client || "",
+    status: data.status,
+    priority: data.priority,
+    assignee: data.assignee || "",
+    created_at: data.created_at,
+    updated_at: data.updated_at,
+    closed_at: data.closed_at,
+    channel: data.channel || "",
+    product: data.product || "",
+    sla_deadline: data.sla_deadline,
+    serial_number: data.serial_number,
+    plant: data.plant,
+    contact_name: data.contact_name,
+    contact_email: data.contact_email,
+    tags: data.tags,
+    attachments: data.attachments,
+    created_by_name: data.created_by_name,
+    created_by_email: data.created_by_email,
+    content: data.description,
+  };
+}
+
+export async function GET(request: Request, { params }: TicketPdfRouteProps) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return NextResponse.json({ error: "Non autenticato" }, { status: 401 });
-  }
-
   const { slug } = await params;
-  const ticket = await getTicketBySlug(slug);
+  const ticket = await getTicketForPdf(slug, Boolean(user));
 
   if (!ticket) {
+    if (!user) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", `/ticket/${slug}`);
+      return NextResponse.redirect(loginUrl);
+    }
+
     return NextResponse.json({ error: "Ticket non trovato" }, { status: 404 });
   }
 
