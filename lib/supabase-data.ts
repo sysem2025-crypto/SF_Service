@@ -10,6 +10,7 @@ export type TicketRecord = {
   assignee: string;
   created_at: string;
   updated_at: string;
+  closed_at?: string;
   channel: string;
   product: string;
   sla_deadline?: string;
@@ -74,6 +75,7 @@ export async function getTickets(): Promise<TicketRecord[]> {
     assignee: t.assignee || "",
     created_at: t.created_at,
     updated_at: t.updated_at,
+    closed_at: t.closed_at,
     channel: t.channel || "",
     product: t.product || "",
     sla_deadline: t.sla_deadline,
@@ -129,6 +131,7 @@ export async function getTicketBySlug(slug: string) {
     assignee: data.assignee || "",
     created_at: data.created_at,
     updated_at: data.updated_at,
+    closed_at: data.closed_at,
     channel: data.channel || "",
     product: data.product || "",
     sla_deadline: data.sla_deadline,
@@ -173,6 +176,7 @@ export async function getTicketsByCreatorEmail(email: string, openOnly = false) 
     assignee: t.assignee || "",
     created_at: t.created_at,
     updated_at: t.updated_at,
+    closed_at: t.closed_at,
     channel: t.channel || "",
     product: t.product || "",
     sla_deadline: t.sla_deadline,
