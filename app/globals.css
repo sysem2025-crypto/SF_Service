@@ -15,7 +15,7 @@
   --warning-text: #7b560c;
   --success-bg: #e4f1e7;
   --success-text: #2c6139;
-  --shadow: 0 18px 42px rgba(21, 48, 51, 0.08);
+  --shadow: none;
 }
 
 * {
@@ -48,15 +48,15 @@ button {
 }
 
 .page-shell {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1240px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 40px 0 64px;
+  padding: 18px 0 36px;
 }
 
 .ticket-page-shell {
-  width: min(1460px, calc(100% - 24px));
-  padding-top: 14px;
-  padding-bottom: 28px;
+  width: min(1240px, calc(100% - 32px));
+  padding-top: 18px;
+  padding-bottom: 36px;
 }
 
 .portal-hero,
@@ -70,17 +70,17 @@ button {
 }
 
 .portal-hero {
-  margin-bottom: 18px;
-  padding: 42px;
+  margin-bottom: 14px;
+  padding: 20px 22px;
   border-radius: 8px;
-  border-top: 5px solid var(--accent);
+  border-top: 3px solid var(--accent);
 }
 
 .portal-title {
-  margin: 12px 0 0;
-  font-size: clamp(2.2rem, 5vw, 4rem);
-  line-height: 1.04;
-  max-width: 13ch;
+  margin: 6px 0 0;
+  font-size: clamp(1.55rem, 2.4vw, 2.1rem);
+  line-height: 1.12;
+  max-width: none;
 }
 
 .portal-copy,
@@ -94,21 +94,21 @@ button {
 .hero {
   display: grid;
   grid-template-columns: 2fr 0.9fr;
-  gap: 18px;
+  gap: 14px;
   align-items: stretch;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .hero h1 {
-  margin: 10px 0 0;
-  font-size: clamp(2.1rem, 5vw, 3.7rem);
-  line-height: 1.05;
-  max-width: 14ch;
+  margin: 6px 0 0;
+  font-size: clamp(1.55rem, 2.4vw, 2.1rem);
+  line-height: 1.12;
+  max-width: none;
 }
 
 .hero-actions,
 .section-intro {
-  margin-top: 24px;
+  margin-top: 0;
 }
 
 .hero-actions {
@@ -121,44 +121,46 @@ button {
 .section-intro {
   display: flex;
   justify-content: space-between;
-  gap: 20px;
-  align-items: flex-start;
-  margin-bottom: 20px;
+  gap: 16px;
+  align-items: flex-end;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
 }
 
 .section-title {
-  margin: 10px 0 0;
-  font-size: clamp(2rem, 4vw, 3.1rem);
-  line-height: 1.08;
-  max-width: 15ch;
+  margin: 5px 0 0;
+  font-size: clamp(1.45rem, 2.2vw, 1.9rem);
+  line-height: 1.15;
+  max-width: none;
 }
 
 .eyebrow,
 .panel-label {
   display: inline-flex;
-  padding: 6px 10px;
+  padding: 4px 8px;
   border-radius: 4px;
   background: var(--accent-soft);
   color: var(--accent-strong);
-  font-size: 0.76rem;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0;
   text-transform: uppercase;
 }
 
 .hero-panel {
-  padding: 24px;
+  padding: 18px;
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  border-top: 5px solid var(--accent);
+  border-top: 3px solid var(--accent);
 }
 
 .hero-panel strong {
-  font-size: 4rem;
+  font-size: 2.4rem;
   line-height: 1;
-  margin: 18px 0 8px;
+  margin: 12px 0 6px;
 }
 
 .hero-panel p,
@@ -177,44 +179,56 @@ button {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .stat-card {
   border-radius: 8px;
-  padding: 18px;
+  padding: 14px;
 }
 
 .stat-card strong {
   display: block;
-  margin-top: 14px;
+  margin-top: 8px;
   color: var(--accent-strong);
-  font-size: 2rem;
+  font-size: 1.45rem;
 }
 
 .content-grid {
   display: grid;
   grid-template-columns: 1.45fr 1fr;
-  gap: 14px;
+  gap: 10px;
 }
 
 .surface {
   border-radius: 8px;
-  padding: 22px;
+  padding: 16px;
 }
 
 .section-heading {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .section-heading h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.05rem;
 }
 
 .section-heading p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
+}
+
+.section-heading-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.section-heading-row p {
+  margin: 0;
 }
 
 .priority-columns {
@@ -349,7 +363,7 @@ button {
 }
 
 .filters-surface {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .filter-row {
@@ -383,7 +397,7 @@ button {
 
 .ticket-table th,
 .ticket-table td {
-  padding: 14px 12px;
+  padding: 10px 12px;
   border-top: 1px solid var(--line);
   text-align: left;
   white-space: nowrap;
@@ -433,8 +447,8 @@ button {
 }
 
 .ticket-detail-hero {
-  margin: 0 0 10px;
-  padding-bottom: 8px;
+  margin: 0 0 12px;
+  padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
 }
 
@@ -466,8 +480,9 @@ button {
   margin-top: 0;
   margin-bottom: 4px;
   max-width: 34ch;
-  font-size: clamp(1.55rem, 2vw, 2rem);
+  font-size: clamp(1.3rem, 1.8vw, 1.65rem);
   line-height: 1.03;
+  overflow-wrap: anywhere;
 }
 
 .ticket-detail-hero .hero-copy {
@@ -499,7 +514,7 @@ button {
 }
 
 .ticket-page-shell .surface {
-  padding: 12px;
+  padding: 14px;
 }
 
 .ticket-console > * {
@@ -693,16 +708,16 @@ button {
 .portal-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .portal-card {
   display: grid;
   align-content: space-between;
-  min-height: 154px;
-  gap: 12px;
-  padding: 22px;
+  min-height: 112px;
+  gap: 10px;
+  padding: 16px;
   border-radius: 8px;
 }
 
@@ -712,7 +727,7 @@ button {
 }
 
 .portal-card strong {
-  font-size: 1.25rem;
+  font-size: 1.05rem;
 }
 
 .portal-card p {
@@ -1006,6 +1021,27 @@ button {
     padding: 18px;
   }
 
+  .ticket-page-shell .surface {
+    padding: 12px;
+  }
+
+  .ticket-detail-actions,
+  .ticket-detail-actions .secondary-link,
+  .ticket-detail-actions .text-link,
+  .ticket-operation-actions .primary-link,
+  .danger-link {
+    width: 100%;
+  }
+
+  .ticket-detail-actions .secondary-link,
+  .ticket-detail-actions .text-link {
+    justify-content: center;
+  }
+
+  .ticket-detail-kicker {
+    gap: 6px;
+  }
+
   .portal-card {
     min-height: 132px;
   }
@@ -1030,7 +1066,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 6px 16px;
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   position: sticky;
@@ -1040,7 +1076,7 @@ button {
 
 .app-logo {
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: var(--accent);
   text-decoration: none;
 }
@@ -1052,11 +1088,11 @@ button {
 }
 
 .nav-link {
-  padding: 6px 14px;
-  border-radius: 6px;
+  padding: 5px 10px;
+  border-radius: 4px;
   text-decoration: none;
   color: var(--text);
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 500;
   transition: background 0.15s;
 }
@@ -1090,8 +1126,8 @@ button {
 .app-footer {
   display: flex;
   justify-content: space-between;
-  padding: 14px 24px;
-  font-size: 0.8rem;
+  padding: 8px 16px;
+  font-size: 0.75rem;
   color: var(--muted);
   border-top: 1px solid var(--line);
   background: var(--surface);

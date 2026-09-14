@@ -52,9 +52,9 @@ export default async function MyTicketsPage() {
       <section className="surface">
         <div className="section-heading">
           <h2>Ticket aperti e sincronizzati</h2>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          <div className="section-heading-row">
             <p>{tickets.length} record</p>
-            <Link href="/ticket/nuovo" className="text-link" style={{ fontWeight: 600 }}>
+            <Link href="/ticket/nuovo" className="text-link">
               + Nuovo ticket
             </Link>
           </div>
