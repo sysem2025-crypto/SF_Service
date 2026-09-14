@@ -76,10 +76,29 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
   }
 
   return (
-    <main className="page-shell auth-shell">
-      <section className="surface auth-card ticket-form-card">
+    <main className="page-shell ticket-page-shell">
+      <section className="ticket-detail-hero">
+        <div className="ticket-detail-title-row">
+          <div>
+            <div className="ticket-detail-kicker">
+              <span className="eyebrow">Ticket</span>
+              <span className="ticket-status-chip">Nuovo</span>
+            </div>
+            <h1 className="section-title">Nuovo ticket</h1>
+          </div>
+
+          <div className="ticket-detail-actions">
+            <Link href="/my-tickets" className="text-link">
+              I miei ticket
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="surface ticket-console ticket-create-console">
+        <article className="ticket-operations ticket-form-card">
         <div className="section-heading">
-          <h2>Nuovo ticket</h2>
+          <h2>Gestione</h2>
         </div>
 
         {createdTicketId && (
@@ -172,6 +191,7 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
             {loading ? "Invio..." : "Invia ticket"}
           </button>
         </form>
+        </article>
       </section>
     </main>
   );

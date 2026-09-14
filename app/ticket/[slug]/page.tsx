@@ -254,39 +254,7 @@ export default async function TicketDetailPage({
       </section>
 
       <section className="surface ticket-console">
-        <article className="ticket-content">
-          <div className="section-heading">
-            <h2>Contenuto</h2>
-          </div>
-
-          <div className="markdown-body">
-            {blocks.length > 0 ? (
-              blocks.map((block) =>
-                block.startsWith("#") ? (
-                  <h3 key={block}>{block.replace(/^#+\s*/, "")}</h3>
-                ) : block.startsWith("- ") ? (
-                  <ul key={block}>
-                    {block.split(/\r?\n/).map((line) => (
-                      <li key={line}>{line.replace(/^- /, "")}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p key={block}>{block}</p>
-                )
-              )
-            ) : (
-              <p className="empty-state">Nessuna descrizione inserita.</p>
-            )}
-          </div>
-        </article>
-
-        <section className="ticket-summary">
-          <div className="section-heading ticket-panel-heading">
-            <h2>Dati ticket</h2>
-          </div>
-          <TicketInfo ticket={ticket} contact={contact} email={email} />
-        </section>
-
+        <aside className="ticket-side-panel">
         {manageable ? (
           <section className="ticket-operations">
             <div className="section-heading ticket-panel-heading">
@@ -395,6 +363,40 @@ export default async function TicketDetailPage({
             </dl>
           </section>
         )}
+
+          <section className="ticket-summary">
+            <div className="section-heading ticket-panel-heading">
+              <h2>Dati ticket</h2>
+            </div>
+            <TicketInfo ticket={ticket} contact={contact} email={email} />
+          </section>
+        </aside>
+
+        <article className="ticket-content">
+          <div className="section-heading">
+            <h2>Contenuto</h2>
+          </div>
+
+          <div className="markdown-body">
+            {blocks.length > 0 ? (
+              blocks.map((block) =>
+                block.startsWith("#") ? (
+                  <h3 key={block}>{block.replace(/^#+\s*/, "")}</h3>
+                ) : block.startsWith("- ") ? (
+                  <ul key={block}>
+                    {block.split(/\r?\n/).map((line) => (
+                      <li key={line}>{line.replace(/^- /, "")}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p key={block}>{block}</p>
+                )
+              )
+            ) : (
+              <p className="empty-state">Nessuna descrizione inserita.</p>
+            )}
+          </div>
+        </article>
       </section>
     </main>
   );

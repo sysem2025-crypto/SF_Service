@@ -489,7 +489,7 @@ button {
 
 .ticket-console {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) 330px 420px;
+  grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
   align-items: start;
   gap: 0;
 }
@@ -511,9 +511,19 @@ button {
   border-left: 1px solid var(--line);
 }
 
+.ticket-side-panel {
+  display: grid;
+  gap: 10px;
+}
+
 .ticket-summary {
   display: grid;
   gap: 0;
+}
+
+.ticket-side-panel .ticket-summary {
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
 }
 
 .ticket-panel-heading {
@@ -736,7 +746,38 @@ button {
 }
 
 .ticket-form-card {
-  width: min(860px, 100%);
+  width: 100%;
+}
+
+.ticket-create-console {
+  grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+}
+
+.ticket-create-console::after {
+  content: "";
+  min-height: 1px;
+}
+
+.ticket-create-console .auth-form {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 8px;
+}
+
+.ticket-create-console .auth-form label {
+  gap: 4px;
+  font-size: 0.72rem;
+}
+
+.ticket-create-console .auth-form input,
+.ticket-create-console .auth-form select,
+.ticket-create-console .auth-form textarea {
+  padding: 6px 8px;
+  font-size: 0.82rem;
+}
+
+.ticket-create-console .auth-form label:has(textarea),
+.ticket-create-console .auth-form button {
+  grid-column: 1 / -1;
 }
 
 .auth-form {
@@ -915,6 +956,10 @@ button {
   .ticket-console > * + * {
     border-left: 0;
     border-top: 1px solid var(--line);
+  }
+
+  .ticket-create-console::after {
+    display: none;
   }
 
   .ticket-detail-title-row {
