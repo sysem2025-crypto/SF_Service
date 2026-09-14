@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTicketsByCreatorEmail } from "@/lib/supabase-data";
+import { getTickets } from "@/lib/supabase-data";
 import { createClient } from "@/lib/supabase-server";
 
 const statusLabels: Record<string, string> = {
@@ -30,7 +30,15 @@ export default async function MyTicketsPage() {
     return null;
   }
 
-  const tickets = await getTicketsByCreatorEmail(user.email!, true);
+  const userEmail = user.email?.toLowerCase() || "";
+  const tickets = (await getTickets()).filter((ticket) => {
+    const createdByEmail = ticket.created_by_email?.toLowerCase() || "";
+    const isUserTicket = createdByEmail === userEmail;
+    const isLocalTicket = ticket.channel === "locale";
+    const isOpen = ticket.status !== "chiuso";
+
+    return isOpen && (isUserTicket || isLocalTicket);
+  });
 
   return (
     <main className="page-shell">
@@ -43,7 +51,7 @@ export default async function MyTicketsPage() {
 
       <section className="surface">
         <div className="section-heading">
-          <h2>Ticket aperti</h2>
+          <h2>Ticket aperti e sincronizzati</h2>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
             <p>{tickets.length} record</p>
             <Link href="/ticket/nuovo" className="text-link" style={{ fontWeight: 600 }}>
@@ -70,11 +78,11 @@ export default async function MyTicketsPage() {
                   <tr key={ticket.slug}>
                     <td>
                       <Link href={`/ticket/${ticket.slug}`} className="text-link">
-                        {ticket.id}
+                        {ticket.display_code}
                       </Link>
                     </td>
                     <td>{ticket.client}</td>
-                    <td>{ticket.title}</td>
+                    <td>{ticket.display_title}</td>
                     <td>
                       <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
                         {priorityLabels[ticket.priority] || ticket.priority}
