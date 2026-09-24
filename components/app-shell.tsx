@@ -27,7 +27,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-shell">
       <header className="app-header">
-        <Link href="/" className="app-logo">SF Service</Link>
+        <Link href="/" className="app-logo" aria-label="SYSEM service portal">
+          <img src="/sysem-logo.jpeg" alt="Logo SYSEM" />
+          <span>
+            <strong>SYSEM</strong>
+            <small>Service Portal</small>
+          </span>
+        </Link>
         <nav className="app-nav">
           {navItems.map((item) => (
             <Link
