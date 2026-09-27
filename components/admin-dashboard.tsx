@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getDashboardData } from "@/lib/supabase-data";
+import { revalidatePath } from "next/cache";
 
 const priorityLabels = {
   critica: "Critica",
@@ -14,6 +15,25 @@ const statusLabels = {
   chiuso: "Chiuso",
   rifiutato: "Rifiutato",
 } as const;
+
+async function updateTicketDates(formData: FormData) {
+  "use server";
+  const ticketId = String(formData.get("ticketId") || "");
+  const createdAt = String(formData.get("created_at") || "");
+  const updatedAt = String(formData.get("updated_at") || "");
+
+  const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000";
+
+  await fetch(`${baseUrl}/api/ticket/${ticketId}/dates`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ created_at: createdAt, updated_at: updatedAt }),
+  });
+
+  revalidatePath("/admin");
+}
 
 export async function AdminDashboard() {
   const dashboard = await getDashboardData();
@@ -97,17 +117,41 @@ export async function AdminDashboard() {
                   <ul className="ticket-list">
                     {items.length ? (
                       items.map((ticket) => (
-                        <li key={ticket.id} className="ticket-item">
-                          <div>
-                            <strong>
-                              <Link href={`/ticket/${ticket.slug}`}>{ticket.display_code}</Link>
-                            </strong>
-                            <p>{ticket.display_title}</p>
-                          </div>
-                          <div className="ticket-meta">
-                            <span>{ticket.client}</span>
-                            <span>{statusLabels[ticket.status as keyof typeof statusLabels] || ticket.status}</span>
-                          </div>
+<li key={ticket.id} className="ticket-item">
+                          <form action={updateTicketDates} className="ticket-item">
+                            <div>
+                              <strong>
+                                <Link href={`/ticket/${ticket.slug}`}>{ticket.display_code}</Link>
+                              </strong>
+                              <p>{ticket.display_title}</p>
+                            </div>
+                            <div className="ticket-meta">
+                              <span>{ticket.client}</span>
+                              <span>{statusLabels[ticket.status as keyof typeof statusLabels] || ticket.status}</span>
+                            </div>
+                            <div className="ticket-date-fields">
+                              <label>
+                                Creato
+                                <input
+                                  type="datetime-local"
+                                  name="created_at"
+                                  defaultValue={ticket.created_at ? ticket.created_at.slice(0, 16) : ""}
+                                />
+                              </label>
+                              <label>
+                                Aggiornato
+                                <input
+                                  type="datetime-local"
+                                  name="updated_at"
+                                  defaultValue={ticket.updated_at ? ticket.updated_at.slice(0, 16) : ""}
+                                />
+                              </label>
+                              <input type="hidden" name="ticketId" value={ticket.id} />
+                              <button type="submit" className="btn-download-secondary" style={{ fontSize: "0.65rem", padding: "3px 6px", marginTop: "4px" }}>
+                                Salva date
+                              </button>
+                            </div>
+                          </form>
                         </li>
                       ))
                     ) : (
@@ -199,5 +243,39 @@ export async function AdminDashboard() {
         </article>
       </section>
     </main>
+      <style>{`
+        .ticket-date-fields {
+          display: flex;
+          gap: 6px;
+          align-items: flex-end;
+          margin-top: 6px;
+          flex-wrap: wrap;
+        }
+        .ticket-date-fields label {
+          display: flex;
+          flex-direction: column;
+          font-size: 0.6rem;
+          color: var(--muted);
+          gap: 2px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+        .ticket-date-fields input[type="datetime-local"] {
+          width: 130px;
+          padding: 3px 6px;
+          border: 1px solid var(--line);
+          border-radius: 4px;
+          font-size: 0.7rem;
+          background: var(--white);
+          color: var(--text);
+        }
+        .ticket-date-fields input[type="datetime-local"]:focus {
+          outline: 3px solid var(--accent-soft);
+          border-color: var(--aqua);
+        }
+      `}</style>
+    </main>
   );
 }
+

@@ -116,10 +116,10 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
               key={msg.id}
               className={`ticket-chat__message${msg.internal ? " ticket-chat__message--internal" : ""}`}
             >
+              <span className="ticket-chat__message-date">{formatDate(msg.created_at)}</span>
               <div className="ticket-chat__message-header">
                 <span className="ticket-chat__sender">{msg.sender_name}</span>
                 <span className="ticket-chat__role">{msg.sender_role}</span>
-                <span className="ticket-chat__date">{formatDate(msg.created_at)}</span>
                 {msg.internal && <span className="ticket-chat__internal-badge">interno</span>}
               </div>
               <div className="ticket-chat__content">{msg.content}</div>
@@ -192,7 +192,14 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
         }
         .ticket-chat__sender { font-weight: 800; color: var(--ink); }
         .ticket-chat__role { color: var(--aqua); text-transform: uppercase; font-weight: 700; }
-        .ticket-chat__date { color: var(--muted); margin-left: auto; }
+        .ticket-chat__message-date {
+          display: block;
+          font-size: 0.62rem;
+          color: var(--muted);
+          margin-bottom: 2px;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+        }
         .ticket-chat__internal-badge {
           background: var(--aqua); color: var(--white); padding: 1px 6px;
           border-radius: 3px; font-size: 0.62rem; font-weight: 800;
