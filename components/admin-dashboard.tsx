@@ -247,7 +247,6 @@ export async function AdminDashboard() {
           </div>
         </article>
       </section>
-    </main>
       <style>{`
         .ticket-date-fields {
           display: flex;

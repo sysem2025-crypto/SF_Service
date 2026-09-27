@@ -4,9 +4,10 @@ import { requireAdmin } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   await requireAdmin();
+  const { slug } = await params;
 
   const { searchParams } = new URL(request.url);
   const createdAt = searchParams.get("created_at");
