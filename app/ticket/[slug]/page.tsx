@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getCurrentUser } from "@/lib/auth";
 import { getTicketBySlug } from "@/lib/supabase-data";
 import { createClient } from "@/lib/supabase-server";
+import TicketChat from "@/components/ticket-chat";
 
 type TicketDetailPageProps = {
   params: Promise<{
@@ -395,6 +396,10 @@ export default async function TicketDetailPage({
             ) : (
               <p className="empty-state">Nessuna descrizione inserita.</p>
             )}
+          </div>
+
+          <div style={{ marginTop: "20px" }}>
+            <TicketChat ticketId={ticket.id} />
           </div>
         </article>
       </section>

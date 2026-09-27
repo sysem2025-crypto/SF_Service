@@ -18,3 +18,6 @@ Desktop.ini
 # Generated indexes
 data/index/
 .vercel
+tsconfig.tsbuildinfo
+# API routes
+app/api/ticket/[slug]/messages/
