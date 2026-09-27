@@ -1,23 +1,24 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import { getCurrentUser } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase-admin";
 
 type MessageRouteProps = {
   params: Promise<{ slug: string; messageId: string }>;
 };
 
 export async function GET(request: Request, { params }: MessageRouteProps) {
-  const supabase = await createClient();
+  const auth = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await auth.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Non autenticato" }, { status: 401 });
   }
 
   const { messageId } = await params;
-  const { data, error } = await supabase
+  const db = createAdminClient();
+  const { data, error } = await db
     .from("ticket_messages")
     .select("*")
     .eq("id", messageId)
@@ -31,17 +32,19 @@ export async function GET(request: Request, { params }: MessageRouteProps) {
 }
 
 export async function DELETE(request: Request, { params }: MessageRouteProps) {
-  const supabase = await createClient();
+  const auth = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await auth.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Non autenticato" }, { status: 401 });
   }
 
   const { messageId } = await params;
-  const { data, error } = await supabase
+  const db = createAdminClient();
+
+  const { data, error } = await db
     .from("ticket_messages")
     .select("sender_id")
     .eq("id", messageId)
@@ -52,7 +55,7 @@ export async function DELETE(request: Request, { params }: MessageRouteProps) {
   }
 
   if (data.sender_id !== user.id) {
-    const { data: profile } = await supabase
+    const { data: profile } = await auth
       .from("profiles")
       .select("role")
       .eq("id", user.id)
@@ -63,7 +66,7 @@ export async function DELETE(request: Request, { params }: MessageRouteProps) {
     }
   }
 
-  const { error: deleteError } = await supabase
+  const { error: deleteError } = await db
     .from("ticket_messages")
     .delete()
     .eq("id", messageId);

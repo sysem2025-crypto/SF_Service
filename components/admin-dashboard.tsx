@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getDashboardData } from "@/lib/supabase-data";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase-server";
+import { createAdminClient } from "@/lib/supabase-admin";
 
 const priorityLabels = {
   critica: "Critica",
@@ -40,8 +41,34 @@ async function updateTicketDates(formData: FormData) {
   revalidatePath("/admin");
 }
 
+async function deleteMessage(formData: FormData) {
+  "use server";
+  const messageId = String(formData.get("messageId") || "");
+  if (!messageId) return;
+
+  const db = createAdminClient();
+  await db.from("ticket_messages").delete().eq("id", messageId);
+
+  revalidatePath("/admin");
+}
+
 export async function AdminDashboard() {
   const dashboard = await getDashboardData();
+  const db = createAdminClient();
+
+  const { data: recentMessages } = await db
+    .from("ticket_messages")
+    .select("id, ticket_id, sender_name, sender_email, sender_role, content, internal, created_at")
+    .order("created_at", { ascending: false })
+    .limit(30);
+
+  const messages = recentMessages || [];
+
+  const { data: ticketSlugs } = await db
+    .from("tickets")
+    .select("id, slug, display_code");
+
+  const ticketMap = new Map((ticketSlugs || []).map((t: any) => [t.id, t]));
 
   return (
     <main className="page-shell">
@@ -234,6 +261,54 @@ export async function AdminDashboard() {
 
         <article className="surface">
           <div className="section-heading">
+            <h2>Messaggi recenti</h2>
+            <p>{messages.length} messaggi</p>
+          </div>
+
+          <ul className="stack-list admin-messages-list">
+            {messages.map((msg: any) => {
+              const ticket = ticketMap.get(msg.ticket_id);
+              return (
+                <li key={msg.id} className="focus-item admin-message-item">
+                  <div className="admin-message-body">
+                    <div className="admin-message-meta">
+                      <strong>{msg.sender_name}</strong>
+                      <span className="admin-message-role">{msg.sender_role}</span>
+                      {msg.internal && <span className="admin-message-internal">interno</span>}
+                      <span className="admin-message-date">
+                        {new Date(msg.created_at).toLocaleString("it-IT", {
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                    <p className="admin-message-content">{msg.content}</p>
+                    {ticket && (
+                      <Link href={`/ticket/${ticket.slug}`} className="admin-message-ticket">
+                        {ticket.display_code}
+                      </Link>
+                    )}
+                  </div>
+                  <form action={deleteMessage} className="admin-message-delete-form">
+                    <input type="hidden" name="messageId" value={msg.id} />
+                    <button type="submit" className="admin-message-delete" title="Cancella messaggio">
+                      &times;
+                    </button>
+                  </form>
+                </li>
+              );
+            })}
+            {!messages.length && (
+              <li className="empty-state">Nessun messaggio.</li>
+            )}
+          </ul>
+        </article>
+
+        <article className="surface">
+          <div className="section-heading">
             <h2>Risorse tecniche</h2>
           </div>
 
@@ -277,6 +352,76 @@ export async function AdminDashboard() {
         .ticket-date-fields input[type="datetime-local"]:focus {
           outline: 3px solid var(--accent-soft);
           border-color: var(--aqua);
+        }
+        .admin-messages-list { max-height: 500px; overflow-y: auto; }
+        .admin-message-item {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 8px;
+        }
+        .admin-message-body { flex: 1; min-width: 0; }
+        .admin-message-meta {
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          flex-wrap: wrap;
+          margin-bottom: 2px;
+        }
+        .admin-message-role {
+          font-size: 0.62rem;
+          color: var(--aqua);
+          text-transform: uppercase;
+          font-weight: 700;
+        }
+        .admin-message-internal {
+          font-size: 0.58rem;
+          background: var(--aqua);
+          color: var(--white);
+          padding: 1px 5px;
+          border-radius: 3px;
+          font-weight: 800;
+          text-transform: uppercase;
+        }
+        .admin-message-date {
+          font-size: 0.62rem;
+          color: var(--muted);
+          margin-left: auto;
+        }
+        .admin-message-content {
+          font-size: 0.8rem;
+          line-height: 1.4;
+          color: var(--text);
+          margin: 2px 0;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .admin-message-ticket {
+          font-size: 0.65rem;
+          color: var(--aqua);
+          font-weight: 700;
+        }
+        .admin-message-delete-form { flex-shrink: 0; }
+        .admin-message-delete {
+          background: none;
+          border: 1px solid var(--line);
+          border-radius: 4px;
+          color: var(--muted);
+          cursor: pointer;
+          font-size: 1rem;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          line-height: 1;
+        }
+        .admin-message-delete:hover {
+          background: rgba(200, 50, 50, 0.1);
+          border-color: rgba(200, 50, 50, 0.4);
+          color: #c83232;
         }
       `}</style>
     </main>

@@ -11,17 +11,23 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showInternal, setShowInternal] = useState(false);
+  const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const loadMessages = useCallback(async () => {
     try {
       const params = new URLSearchParams({ page: "1", per_page: "100" });
       const res = await fetch(`/api/ticket/${ticketId}/messages?${params}`);
-      if (!res.ok) throw new Error("Failed to load");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${res.status}`);
+      }
       const data = await res.json();
       setMessages(data.messages || []);
-    } catch (err) {
+      setError("");
+    } catch (err: any) {
       console.error("[TicketChat] Load error:", err);
+      setError(err.message || "Errore nel caricamento");
     } finally {
       setLoading(false);
     }
@@ -48,16 +54,22 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
     if (!newMessage.trim() || sending) return;
 
     setSending(true);
+    setError("");
     try {
-      await fetch(`/api/ticket/${ticketId}/messages`, {
+      const res = await fetch(`/api/ticket/${ticketId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content: newMessage, content_type: "text" }),
       });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || `Errore invio: HTTP ${res.status}`);
+      }
       setNewMessage("");
       await loadMessages();
-    } catch (err) {
+    } catch (err: any) {
       console.error("[TicketChat] Send error:", err);
+      setError(err.message || "Errore nell'invio del messaggio");
     } finally {
       setSending(false);
     }
@@ -107,6 +119,8 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
 
       {loading ? (
         <div className="ticket-chat__empty">Caricamento messaggi...</div>
+      ) : error ? (
+        <div className="ticket-chat__empty ticket-chat__error">{error}</div>
       ) : visibleMessages.length === 0 ? (
         <div className="ticket-chat__empty">Nessun messaggio ancora.</div>
       ) : (
@@ -144,7 +158,8 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
         />
         <div className="ticket-chat__input-actions">
           <span className="ticket-chat__hint">
-            {session?.user?.role === "admin" && "Le note interne sono visibili solo agli admin"}
+            {error && <span className="ticket-chat__error-text">{error}</span>}
+            {!error && session?.user?.role === "admin" && "Le note interne sono visibili solo agli admin"}
           </span>
           <button type="submit" className="btn-download" disabled={sending || !newMessage.trim()}>
             {sending ? "Invio..." : "Invia"}
@@ -180,6 +195,8 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
           display: flex; flex-direction: column; gap: 10px;
         }
         .ticket-chat__empty { padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem; }
+        .ticket-chat__error { color: #c83232; font-weight: 600; }
+        .ticket-chat__error-text { color: #c83232; font-weight: 600; font-size: 0.7rem; }
         .ticket-chat__message {
           padding: 10px 12px; border-radius: 6px; background: var(--white);
           border: 1px solid var(--line); position: relative;

@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase-server";
-import { getCurrentUser } from "@/lib/auth";
+import { createAdminClient } from "@/lib/supabase-admin";
 
 type MessageRouteProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function GET(request: Request, { params }: MessageRouteProps) {
-  const supabase = await createClient();
+  const auth = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await auth.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Non autenticato" }, { status: 401 });
@@ -22,8 +22,9 @@ export async function GET(request: Request, { params }: MessageRouteProps) {
   ) as { page?: string; per_page?: string };
 
   const start = (Number(page) - 1) * Number(per_page);
+  const db = createAdminClient();
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("ticket_messages")
     .select("*")
     .eq("ticket_id", slug)
@@ -34,7 +35,7 @@ export async function GET(request: Request, { params }: MessageRouteProps) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  const { count } = await supabase
+  const { count } = await db
     .from("ticket_messages")
     .select("*", { count: "exact", head: true })
     .eq("ticket_id", slug);
@@ -48,10 +49,10 @@ export async function GET(request: Request, { params }: MessageRouteProps) {
 }
 
 export async function POST(request: Request, { params }: MessageRouteProps) {
-  const supabase = await createClient();
+  const auth = await createClient();
   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await auth.auth.getUser();
 
   if (!user) {
     return NextResponse.json({ error: "Non autenticato" }, { status: 401 });
@@ -65,13 +66,15 @@ export async function POST(request: Request, { params }: MessageRouteProps) {
     return NextResponse.json({ error: "Contenuto vuoto" }, { status: 400 });
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await auth
     .from("profiles")
     .select("full_name, role")
     .eq("id", user.id)
     .single();
 
-  const { data, error } = await supabase
+  const db = createAdminClient();
+
+  const { data, error } = await db
     .from("ticket_messages")
     .insert({
       ticket_id: slug,

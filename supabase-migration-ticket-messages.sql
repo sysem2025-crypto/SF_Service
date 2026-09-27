@@ -37,7 +37,7 @@ create policy "Users can view messages of own tickets"
       select id from public.tickets
       where created_by_email = auth.email()
        or id in (
-        select ticket_id from public.tickets
+        select id from public.tickets
         where assignee = (select email from auth.users where id = auth.uid())
        )
     )
