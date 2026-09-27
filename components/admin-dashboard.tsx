@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getDashboardData } from "@/lib/supabase-data";
 import { revalidatePath } from "next/cache";
+import { createClient } from "@/lib/supabase-server";
 
 const priorityLabels = {
   critica: "Critica",
@@ -22,15 +23,19 @@ async function updateTicketDates(formData: FormData) {
   const createdAt = String(formData.get("created_at") || "");
   const updatedAt = String(formData.get("updated_at") || "");
 
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000";
+  const updates: Record<string, string> = {};
 
-  await fetch(`${baseUrl}/api/ticket/${ticketId}/dates`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ created_at: createdAt, updated_at: updatedAt }),
-  });
+  if (createdAt) {
+    const d = new Date(createdAt);
+    if (!Number.isNaN(d.getTime())) updates.created_at = d.toISOString();
+  }
+  if (updatedAt) {
+    const d = new Date(updatedAt);
+    if (!Number.isNaN(d.getTime())) updates.updated_at = d.toISOString();
+  }
+
+  const supabase = await createClient();
+  await supabase.from("tickets").update(updates).eq("id", ticketId);
 
   revalidatePath("/admin");
 }
