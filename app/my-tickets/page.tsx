@@ -42,70 +42,74 @@ export default async function MyTicketsPage() {
 
   return (
     <main className="page-shell">
-      <section className="section-intro">
-        <div>
-          <p className="eyebrow">My Tickets</p>
-          <h1 className="section-title">I miei ticket</h1>
-        </div>
-      </section>
-
-      <section className="surface">
-        <div className="section-heading">
-          <h2>Ticket aperti e sincronizzati</h2>
-          <div className="section-heading-row">
-            <p>{tickets.length} record</p>
-            <Link href="/ticket/nuovo" className="text-link">
-              + Nuovo ticket
-            </Link>
+      <div className="content-frame">
+        <div className="page-heading">
+          <div>
+            <p className="eyebrow">Ticket</p>
+            <h1 className="page-title">I miei ticket</h1>
           </div>
         </div>
 
-        {tickets.length ? (
-          <div className="table-shell">
-            <table className="ticket-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Titolo</th>
-                  <th>Priorità</th>
-                  <th>Stato</th>
-                  <th>Aperto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => (
-                  <tr key={ticket.slug}>
-                    <td>
-                      <Link href={`/ticket/${ticket.slug}`} className="text-link">
-                        {ticket.display_code}
-                      </Link>
-                    </td>
-                    <td>{ticket.client}</td>
-                    <td>{ticket.display_title}</td>
-                    <td>
-                      <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
-                        {priorityLabels[ticket.priority] || ticket.priority}
-                      </span>
-                    </td>
-                    <td>{statusLabels[ticket.status] ?? ticket.status}</td>
-                    <td>{ticket.created_at}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className="empty-panel">
-            <p className="empty-state">
-              Nessun ticket aperto.
-            </p>
-            <Link href="/ticket/nuovo" className="primary-link">
-              Nuovo ticket
-            </Link>
-          </div>
-        )}
-      </section>
+        <div className="page-body">
+          <section className="surface">
+            <div className="section-heading">
+              <h2>Ticket aperti e sincronizzati</h2>
+              <div className="section-heading-row">
+                <p>{tickets.length} record</p>
+                <Link href="/ticket/nuovo" className="btn-download">
+                  + Nuovo ticket
+                </Link>
+              </div>
+            </div>
+
+            {tickets.length ? (
+              <div className="table-shell">
+                <table className="ticket-table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Cliente</th>
+                      <th>Titolo</th>
+                      <th>Priorità</th>
+                      <th>Stato</th>
+                      <th>Aperto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {tickets.map((ticket) => (
+                      <tr key={ticket.slug}>
+                        <td>
+                          <Link href={`/ticket/${ticket.slug}`} className="btn-download">
+                            {ticket.display_code}
+                          </Link>
+                        </td>
+                        <td>{ticket.client}</td>
+                        <td>{ticket.display_title}</td>
+                        <td>
+                          <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
+                            {priorityLabels[ticket.priority] || ticket.priority}
+                          </span>
+                        </td>
+                        <td>{statusLabels[ticket.status] ?? ticket.status}</td>
+                        <td>{ticket.created_at}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="empty-panel">
+                <p className="empty-state">
+                  Nessun ticket aperto.
+                </p>
+                <Link href="/ticket/nuovo" className="btn-download">
+                  Nuovo ticket
+                </Link>
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
     </main>
   );
 }

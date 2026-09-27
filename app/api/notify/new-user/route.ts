@@ -16,9 +16,9 @@ export async function POST(request: Request) {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
     const { data, error } = await resend.emails.send({
-      from: "SF Service <onboarding@resend.dev>",
+      from: "SYSEM <onboarding@resend.dev>",
       to: "gianluca.piga@sysem.it",
-      subject: "Nuovo utente registrato su SF Service",
+      subject: "Nuovo utente registrato su SYSEM",
       html: `
         <h2>Nuovo utente registrato</h2>
         <p><strong>Email:</strong> ${email}</p>

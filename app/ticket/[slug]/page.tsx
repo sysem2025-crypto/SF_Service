@@ -228,13 +228,13 @@ export default async function TicketDetailPage({
         <div className="ticket-detail-title-row">
           <div>
             <div className="ticket-detail-kicker">
-              <span className="eyebrow">{ticket.id}</span>
+              <span className="eyebrow">{ticket.display_code}</span>
               <span className={`priority-badge ${priorityClass(ticket.priority)}`}>
                 {ticket.priority}
               </span>
               <span className="ticket-status-chip">{ticket.status}</span>
             </div>
-            <h1 className="section-title">{ticket.title}</h1>
+            <h1 className="section-title">{ticket.display_title}</h1>
             <p className="hero-copy">
               {ticket.client || "Cliente non indicato"}
               {ticket.product ? ` · ${ticket.product}` : ""}
@@ -243,12 +243,12 @@ export default async function TicketDetailPage({
           </div>
 
           <div className="ticket-detail-actions">
-            <a href={`/api/ticket/${ticket.id}/pdf`} className="secondary-link">
-              Scarica PDF
-            </a>
-            <Link href="/ticket" className="text-link">
-              Lista ticket
-            </Link>
+<a href={`/api/ticket/${ticket.id}/pdf`} className="btn-download">
+               Scarica PDF
+             </a>
+             <Link href="/ticket" className="btn-download">
+               Lista ticket
+             </Link>
           </div>
         </div>
       </section>
@@ -331,11 +331,11 @@ export default async function TicketDetailPage({
                 <textarea name="description" rows={4} defaultValue={ticket.content || ""} />
               </label>
 
-              <div className="ticket-operation-actions">
-                <button type="submit" className="primary-link">
-                  Salva
-                </button>
-              </div>
+<div className="ticket-operation-actions">
+                 <button type="submit" className="btn-download">
+                   Salva
+                 </button>
+               </div>
             </form>
 
             <form action={closeTicketAction} className="ticket-close-form">

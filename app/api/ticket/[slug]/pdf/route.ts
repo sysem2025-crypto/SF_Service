@@ -61,6 +61,10 @@ function wrapText(text: string, maxChars: number) {
   return lines.length ? lines : [""];
 }
 
+function formatTicketCode(index: number) {
+  return `#${String(index).padStart(3, "0")}`;
+}
+
 function buildPdf(lines: PdfLine[]) {
   const objects: string[] = [];
   const content: string[] = ["BT", "/F1 11 Tf", "50 790 Td"];
@@ -137,9 +141,19 @@ async function getTicketForPdf(slug: string, canUseUserSession: boolean) {
 
   if (error || !data) return null;
 
+  const { data: ticketIds } = await adminClient
+    .from("tickets")
+    .select("id, created_at")
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+  const displayIndex = (ticketIds || []).findIndex((ticket) => ticket.id === data.id) + 1;
+  const display_code = formatTicketCode(displayIndex || 0);
+
   return {
     id: data.id,
     slug: data.id,
+    display_code,
+    display_title: `${display_code} ${data.title}`,
     title: data.title,
     client: data.client || "",
     status: data.status,
@@ -183,7 +197,7 @@ export async function GET(request: Request, { params }: TicketPdfRouteProps) {
   }
 
   const rows = [
-    ["ID", ticket.id],
+    ["ID", ticket.display_code],
     ["Stato", ticket.status],
     ["Priorita", ticket.priority],
     ["Cliente", ticket.client],
@@ -200,8 +214,8 @@ export async function GET(request: Request, { params }: TicketPdfRouteProps) {
   ];
 
   const lines: PdfLine[] = [
-    { text: "SF Service - Ticket", size: 18, gap: 24 },
-    { text: ticket.title, size: 15, gap: 22 },
+    { text: "SYSEM - Ticket", size: 18, gap: 24 },
+    { text: ticket.display_title, size: 15, gap: 22 },
     ...rows.map(([label, value]) => ({
       text: `${label}: ${value}`,
       size: 10,

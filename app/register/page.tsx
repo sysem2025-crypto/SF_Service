@@ -47,59 +47,64 @@ function RegisterForm() {
 
   return (
     <main className="page-shell auth-shell">
-      <section className="surface auth-card">
-        <div className="section-heading">
-          <h2>Richiesta accesso</h2>
+      <div className="content-frame">
+        <div className="page-heading">
+          <h1 className="page-title">Richiesta accesso</h1>
+          <p className="page-subtitle">Compila il modulo per richiedere l'accesso al portale SYSEM.</p>
         </div>
 
-        {requested && (
-          <p className="auth-message success">
-            Registrazione inviata. Controlla la tua email per confermare l'account.
-          </p>
-        )}
-        {(error || formError) && <p className="auth-message error">{formError || error}</p>}
+        <div className="page-body">
+          <section className="surface auth-card">
+            {requested && (
+              <p className="auth-message success">
+                Registrazione inviata. Controlla la tua email per confermare l'account.
+              </p>
+            )}
+            {(error || formError) && <p className="auth-message error">{formError || error}</p>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>
-            <span>Nome e cognome</span>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </label>
-          <label>
-            <span>Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </label>
-          <label>
-            <span>Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              disabled={loading}
-            />
-          </label>
-          <button type="submit" className="primary-link button-reset" disabled={loading}>
-            {loading ? "Invio..." : "Invia"}
-          </button>
-        </form>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <label>
+                <span>Nome e cognome</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </label>
+              <label>
+                <span>Email</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </label>
+              <label>
+                <span>Password</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  disabled={loading}
+                />
+              </label>
+              <button type="submit" className="btn-download" disabled={loading}>
+                {loading ? "Invio..." : "Invia"}
+              </button>
+            </form>
 
-        <p className="auth-inline-links">
-          Account esistente: <Link href="/login">accedi</Link>
-        </p>
-      </section>
+            <p className="auth-inline-links">
+              Account esistente: <Link href="/login">accedi</Link>
+            </p>
+          </section>
+        </div>
+      </div>
     </main>
   );
 }

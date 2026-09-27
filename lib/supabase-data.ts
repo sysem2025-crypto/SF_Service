@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase-server";
 export type TicketRecord = {
   id: string;
   slug: string;
+  display_code: string;
+  display_title: string;
   title: string;
   client: string;
   status: string;
@@ -53,19 +55,61 @@ async function getSupabase() {
   return createClient();
 }
 
-export async function getTickets(): Promise<TicketRecord[]> {
+function formatTicketCode(index: number) {
+  return `#${String(index).padStart(3, "0")}`;
+}
+
+function withTicketDisplayFields<T extends { id: string; title: string; created_at: string }>(
+  ticket: T,
+  displayMap: Map<string, string>
+) {
+  const display_code = displayMap.get(ticket.id) || formatTicketCode(0);
+
+  return {
+    ...ticket,
+    display_code,
+    display_title: `${display_code} ${ticket.title}`,
+  };
+}
+
+async function getTicketDisplayMap() {
   const supabase = await getSupabase();
   const { data, error } = await supabase
     .from("tickets")
-    .select("*")
-    .order("updated_at", { ascending: false });
+    .select("id, created_at")
+    .order("created_at", { ascending: true })
+    .order("id", { ascending: true });
+
+  if (error) {
+    console.error("Error fetching ticket display map:", error);
+    return new Map<string, string>();
+  }
+
+  return new Map(
+    (data || []).map((ticket, index) => [
+      ticket.id,
+      formatTicketCode(index + 1),
+    ])
+  );
+}
+
+export async function getTickets(): Promise<TicketRecord[]> {
+  const supabase = await getSupabase();
+  const [displayMap, result] = await Promise.all([
+    getTicketDisplayMap(),
+    supabase
+      .from("tickets")
+      .select("*")
+      .order("updated_at", { ascending: false }),
+  ]);
+  const { data, error } = result;
 
   if (error) {
     console.error("Error fetching tickets:", error);
     return [];
   }
 
-  return (data || []).map((t) => ({
+  return (data || []).map((t) => withTicketDisplayFields({
     id: t.id,
     slug: t.id,
     title: t.title,
@@ -88,7 +132,7 @@ export async function getTickets(): Promise<TicketRecord[]> {
     created_by_name: t.created_by_name,
     created_by_email: t.created_by_email,
     content: t.description,
-  }));
+  }, displayMap));
 }
 
 export async function getClients(): Promise<ClientRecord[]> {
@@ -113,15 +157,19 @@ export async function getClients(): Promise<ClientRecord[]> {
 
 export async function getTicketBySlug(slug: string) {
   const supabase = await getSupabase();
-  const { data, error } = await supabase
-    .from("tickets")
-    .select("*")
-    .eq("id", slug)
-    .single();
+  const [displayMap, result] = await Promise.all([
+    getTicketDisplayMap(),
+    supabase
+      .from("tickets")
+      .select("*")
+      .eq("id", slug)
+      .single(),
+  ]);
+  const { data, error } = result;
 
   if (error || !data) return null;
 
-  return {
+  return withTicketDisplayFields({
     id: data.id,
     slug: data.id,
     title: data.title,
@@ -144,11 +192,12 @@ export async function getTicketBySlug(slug: string) {
     created_by_name: data.created_by_name,
     created_by_email: data.created_by_email,
     content: data.description,
-  };
+  }, displayMap);
 }
 
 export async function getTicketsByCreatorEmail(email: string, openOnly = false) {
   const supabase = await getSupabase();
+  const displayMap = await getTicketDisplayMap();
   let query = supabase
     .from("tickets")
     .select("*")
@@ -166,7 +215,7 @@ export async function getTicketsByCreatorEmail(email: string, openOnly = false) 
     return [];
   }
 
-  return (data || []).map((t) => ({
+  return (data || []).map((t) => withTicketDisplayFields({
     id: t.id,
     slug: t.id,
     title: t.title,
@@ -189,7 +238,7 @@ export async function getTicketsByCreatorEmail(email: string, openOnly = false) 
     created_by_name: t.created_by_name,
     created_by_email: t.created_by_email,
     content: t.description,
-  }));
+  }, displayMap));
 }
 
 export async function getProcedureDocuments(): Promise<DocumentRecord[]> {

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "@/components/supabase-provider";
@@ -9,12 +10,14 @@ import type { Route } from "next";
 const navItems: { href: Route; label: string }[] = [
   { href: "/my-tickets", label: "I miei ticket" },
   { href: "/ticket/nuovo", label: "Nuovo ticket" },
+  { href: "/admin", label: "Admin" },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const session = useSession();
   const pathname = usePathname();
   const supabase = createClient();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   async function handleLogout() {
     await supabase.auth.signOut();
@@ -24,37 +27,62 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     window.location.href = "https://sysem.it";
   }
 
+  function toggleMenu() {
+    setMenuOpen((prev) => !prev);
+  }
+
   return (
-    <div className="app-shell">
-      <header className="app-header">
-        <Link href="/" className="app-logo" aria-label="SYSEM service portal">
-          <img src="/sysem-logo.jpeg" alt="Logo SYSEM" />
-          <span>
-            <strong>SYSEM</strong>
-            <small>Service Portal</small>
-          </span>
-        </Link>
-        <nav className="app-nav">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`nav-link ${pathname === item.href ? "active" : ""}`}
-            >
-              {item.label}
-            </Link>
-          ))}
-          <button onClick={handleLogout} className="nav-link nav-button">
-            Esci
+    <div className="site">
+      <header className="site-header">
+        <div className="site-header__left">
+          <Link href="/" className="app-logo" aria-label="SYSEM service portal">
+            <img src="/sysem-logo.jpeg" alt="Logo SYSEM" />
+            <span>
+              <strong>SYSEM</strong>
+              <small>Assistenza tecnica</small>
+            </span>
+          </Link>
+          <span className="app-header__menu">Service desk</span>
+          <button className="nav-toggle" id="menu-toggle" onClick={toggleMenu} aria-label="Apri menu">
+            <span></span><span></span><span></span>
           </button>
+        </div>
+        <nav className={`app-nav${menuOpen ? " open" : ""}`} id="overlay-menu">
+          {session ? (
+            <>
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`nav-link${pathname === item.href ? " active" : ""}`}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <button onClick={handleLogout} className="nav-link nav-button">
+                Esci
+              </button>
+            </>
+          ) : (
+            <a href="https://www.sysem.it/ticketing.html" className="nav-link" onClick={() => setMenuOpen(false)}>
+              Accedi da SYSEM
+            </a>
+          )}
         </nav>
       </header>
 
-      <main className="app-main">{children}</main>
+      <main className="site-body">
+        <div className="content-frame">
+          {children}
+        </div>
+      </main>
 
       <footer className="app-footer">
-        <span>SF Service Portal &mdash; SYSEM</span>
-        {session?.user?.email && <span>{session.user.email}</span>}
+        <div className="app-footer-inner">
+          <span>SYSEM</span>
+          {session?.user?.email && <span>{session.user.email}</span>}
+        </div>
       </footer>
     </div>
   );

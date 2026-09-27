@@ -87,8 +87,8 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
             <h1 className="section-title">Nuovo ticket</h1>
           </div>
 
-          <div className="ticket-detail-actions">
-            <Link href="/my-tickets" className="text-link">
+<div className="ticket-detail-actions">
+            <Link href="/my-tickets" className="btn-download">
               I miei ticket
             </Link>
           </div>
@@ -104,9 +104,9 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
         {createdTicketId && (
           <div className="success-stack">
             <p className="auth-message success">
-              Ticket {createdTicketId} creato.
+              Ticket creato.
             </p>
-            <Link href="/my-tickets" className="text-link">
+            <Link href="/my-tickets" className="btn-download">
               I miei ticket
             </Link>
           </div>
@@ -187,7 +187,7 @@ export default function NewTicketPage({ searchParams }: { searchParams: Promise<
               disabled={loading}
             />
           </label>
-          <button type="submit" className="primary-link button-reset" disabled={loading}>
+          <button type="submit" className="btn-download" disabled={loading}>
             {loading ? "Invio..." : "Invia ticket"}
           </button>
         </form>

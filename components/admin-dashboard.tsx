@@ -100,9 +100,9 @@ export async function AdminDashboard() {
                         <li key={ticket.id} className="ticket-item">
                           <div>
                             <strong>
-                              <Link href={`/ticket/${ticket.slug}`}>{ticket.id}</Link>
+                              <Link href={`/ticket/${ticket.slug}`}>{ticket.display_code}</Link>
                             </strong>
-                            <p>{ticket.title}</p>
+                            <p>{ticket.display_title}</p>
                           </div>
                           <div className="ticket-meta">
                             <span>{ticket.client}</span>
@@ -131,10 +131,10 @@ export async function AdminDashboard() {
                 <div>
                   <strong>
                     <Link href={`/ticket/${ticket.slug}`}>
-                      {ticket.id} · {ticket.client}
+                      {ticket.display_code} · {ticket.client}
                     </Link>
                   </strong>
-                  <p>{ticket.title}</p>
+                  <p>{ticket.display_title}</p>
                 </div>
                 <span>{ticket.sla_deadline || "SLA n/d"}</span>
               </li>
@@ -173,9 +173,9 @@ export async function AdminDashboard() {
               <li key={ticket.id} className="focus-item">
                 <div>
                   <strong>
-                    <Link href={`/ticket/${ticket.slug}`}>{ticket.id}</Link>
+                    <Link href={`/ticket/${ticket.slug}`}>{ticket.display_code}</Link>
                   </strong>
-                  <p>{ticket.title}</p>
+                  <p>{ticket.display_title}</p>
                 </div>
                 <span>{ticket.updated_at}</span>
               </li>

@@ -4,8 +4,8 @@ import SupabaseProvider from "@/components/supabase-provider";
 import AppShell from "@/components/app-shell";
 
 export const metadata: Metadata = {
-  title: "SF Service Portal",
-  description: "Portale assistenza tecnica",
+  title: "SYSEM | Assistenza tecnica",
+  description: "Portale assistenza tecnica SYSEM",
 };
 
 export default function RootLayout({
@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it">
-      <body>
+      <body data-page="ticketing">
         <SupabaseProvider>
           <AppShell>{children}</AppShell>
         </SupabaseProvider>

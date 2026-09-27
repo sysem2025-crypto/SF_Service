@@ -34,74 +34,76 @@ export default async function TicketPage() {
 
   return (
     <main className="page-shell">
-      <section className="section-intro">
-        <div>
-          <p className="eyebrow">Ticket</p>
-          <h1 className="section-title">Lista ticket</h1>
+      <div className="content-frame">
+        <div className="page-heading">
+          <div>
+            <p className="eyebrow">Ticket</p>
+            <h1 className="page-title">Lista ticket</h1>
+          </div>
+          <Link href="/admin" className="btn-download">
+            Dashboard
+          </Link>
         </div>
 
-        <Link href="/admin" className="text-link">
-          Dashboard
-        </Link>
-      </section>
+        <div className="page-body">
+          <section className="surface filters-surface">
+            <div className="section-heading">
+              <h2>Filtri</h2>
+            </div>
+            <div className="filter-row">
+              <span className="filter-chip">Critica-Alta</span>
+              <span className="filter-chip">In attesa cliente</span>
+              <span className="filter-chip">Modbus</span>
+              <span className="filter-chip">Cliente</span>
+              <span className="filter-chip">Responsabile</span>
+            </div>
+          </section>
 
-      <section className="surface filters-surface">
-        <div className="section-heading">
-          <h2>Filtri</h2>
-        </div>
+          <section className="surface">
+            <div className="section-heading">
+              <h2>Tutti i ticket</h2>
+              <p>{tickets.length} record</p>
+            </div>
 
-        <div className="filter-row">
-          <span className="filter-chip">Critica-Alta</span>
-          <span className="filter-chip">In attesa cliente</span>
-          <span className="filter-chip">Modbus</span>
-          <span className="filter-chip">Cliente</span>
-          <span className="filter-chip">Responsabile</span>
+            <div className="table-shell">
+              <table className="ticket-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Cliente</th>
+                    <th>Titolo</th>
+                    <th>Priorità</th>
+                    <th>Stato</th>
+                    <th>Responsabile</th>
+                    <th>Aggiornato</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {tickets.map((ticket) => (
+                    <tr key={ticket.slug}>
+                      <td>
+                        <Link href={`/ticket/${ticket.slug}`} className="btn-download">
+                          {ticket.display_code}
+                        </Link>
+                      </td>
+                      <td>{ticket.client}</td>
+                      <td>{ticket.display_title}</td>
+                      <td>
+                        <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
+                          {priorityLabels[ticket.priority] || ticket.priority}
+                        </span>
+                      </td>
+                      <td>{statusLabels[ticket.status] ?? ticket.status}</td>
+                      <td>{ticket.assignee}</td>
+                      <td>{ticket.updated_at}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
-      </section>
-
-      <section className="surface">
-        <div className="section-heading">
-          <h2>Tutti i ticket</h2>
-          <p>{tickets.length} record</p>
-        </div>
-
-        <div className="table-shell">
-          <table className="ticket-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Titolo</th>
-                <th>Priorità</th>
-                <th>Stato</th>
-                <th>Responsabile</th>
-                <th>Aggiornato</th>
-              </tr>
-            </thead>
-            <tbody>
-              {tickets.map((ticket) => (
-                <tr key={ticket.slug}>
-                  <td>
-                    <Link href={`/ticket/${ticket.slug}`} className="text-link">
-                      {ticket.id}
-                    </Link>
-                  </td>
-                  <td>{ticket.client}</td>
-                  <td>{ticket.title}</td>
-                  <td>
-                    <span className={`priority-badge priority-${ticket.priority.toLowerCase()}`}>
-                      {priorityLabels[ticket.priority] || ticket.priority}
-                    </span>
-                  </td>
-                  <td>{statusLabels[ticket.status] ?? ticket.status}</td>
-                  <td>{ticket.assignee}</td>
-                  <td>{ticket.updated_at}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      </div>
     </main>
   );
 }

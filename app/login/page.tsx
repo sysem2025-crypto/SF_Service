@@ -46,45 +46,54 @@ function LoginForm() {
 
   return (
     <main className="page-shell auth-shell">
-      <section className="surface auth-card">
-        <div className="section-heading">
-          <h2>Accesso</h2>
+      <div className="content-frame">
+        <div className="page-heading">
+          <h1 className="page-title">Accesso</h1>
+          <p className="page-subtitle">Per usare lo stesso account, entra prima dall'area riservata SYSEM.</p>
         </div>
 
-        {registered && <p className="auth-message success">Registrazione completata. Ora puoi accedere.</p>}
-        {(error || formError) && <p className="auth-message error">{formError || errorMessages[error] || "Accesso non riuscito."}</p>}
+        <div className="page-body">
+          <section className="surface auth-card">
+            {registered && <p className="auth-message success">Registrazione completata. Ora puoi accedere.</p>}
+            {(error || formError) && <p className="auth-message error">{formError || errorMessages[error] || "Accesso non riuscito."}</p>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <label>
-            <span>Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-          </label>
-          <label>
-            <span>Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              disabled={loading}
-            />
-          </label>
-          <button type="submit" className="primary-link button-reset" disabled={loading}>
-            {loading ? "Accesso..." : "Entra"}
-          </button>
-        </form>
+            <form onSubmit={handleSubmit} className="auth-form">
+              <label>
+                <span>Email</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </label>
+              <label>
+                <span>Password</span>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  disabled={loading}
+                />
+              </label>
+              <button type="submit" className="btn-download" disabled={loading}>
+                {loading ? "Accesso..." : "Entra"}
+              </button>
+            </form>
 
-        <p className="auth-inline-links">
-          Nuovo account: <Link href="/register">richiedi accesso</Link>
-        </p>
-      </section>
+            <p className="auth-inline-links">
+              <a href="https://www.sysem.it/ticketing.html">Accedi dal sito SYSEM</a>
+            </p>
+
+            <p className="auth-inline-links">
+              Nuovo account: <Link href="/register">richiedi accesso</Link>
+            </p>
+          </section>
+        </div>
+      </div>
     </main>
   );
 }
