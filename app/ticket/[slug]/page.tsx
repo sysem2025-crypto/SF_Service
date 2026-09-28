@@ -376,6 +376,7 @@ export default async function TicketDetailPage({
         <article className="ticket-content">
           <div className="section-heading">
             <h2>Contenuto</h2>
+            <span className="ticket-content-date">{formatDate(ticket.created_at)}</span>
           </div>
 
           <div className="markdown-body">
@@ -398,11 +399,24 @@ export default async function TicketDetailPage({
             )}
           </div>
 
-          <div style={{ marginTop: "20px" }}>
+<div style={{ marginTop: "20px" }}>
             <TicketChat ticketId={ticket.id} />
           </div>
         </article>
       </section>
+
+      <style>{`
+        .ticket-content-date {
+          font-size: 0.68rem;
+          color: var(--muted);
+          font-weight: 600;
+        }
+        .ticket-content .section-heading {
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+        }
+      `}</style>
     </main>
   );
 }

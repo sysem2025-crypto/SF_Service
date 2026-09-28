@@ -179,11 +179,11 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 12px 16px;
+          padding: 8px 12px;
           border-bottom: 1px solid var(--line);
           background: rgba(250, 246, 235, 0.7);
         }
-        .ticket-chat__header h3 { margin: 0; font-size: 1rem; color: var(--aqua); }
+        .ticket-chat__header h3 { margin: 0; font-size: 0.82rem; color: var(--aqua); }
         .ticket-chat__header-actions .btn-download-secondary {
           border-color: var(--line); font-size: 0.7rem; padding: 4px 8px;
         }
@@ -191,38 +191,38 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
           background: var(--accent-soft); border-color: var(--aqua); color: var(--aqua);
         }
         .ticket-chat__messages {
-          max-height: 400px; overflow-y: auto; padding: 12px 16px;
-          display: flex; flex-direction: column; gap: 10px;
+          max-height: 350px; overflow-y: auto; padding: 8px 12px;
+          display: flex; flex-direction: column; gap: 8px;
         }
-        .ticket-chat__empty { padding: 20px; text-align: center; color: var(--muted); font-size: 0.85rem; }
-        .ticket-chat__error { color: #c83232; font-weight: 600; }
-        .ticket-chat__error-text { color: #c83232; font-weight: 600; font-size: 0.7rem; }
+        .ticket-chat__empty { padding: 16px; text-align: center; color: var(--muted); font-size: 0.75rem; }
+        .ticket-chat__error { color: #c83232; font-weight: 600; font-size: 0.75rem; }
+        .ticket-chat__error-text { color: #c83232; font-weight: 600; font-size: 0.65rem; }
         .ticket-chat__message {
-          padding: 10px 12px; border-radius: 6px; background: var(--white);
+          padding: 7px 10px; border-radius: 5px; background: var(--white);
           border: 1px solid var(--line); position: relative;
         }
         .ticket-chat__message--internal {
           background: rgba(47, 74, 69, 0.06); border-color: rgba(47, 74, 69, 0.2);
         }
         .ticket-chat__message-header {
-          display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 0.72rem;
+          display: flex; align-items: center; gap: 6px; margin-bottom: 2px; font-size: 0.68rem;
         }
-        .ticket-chat__sender { font-weight: 800; color: var(--ink); }
-        .ticket-chat__role { color: var(--aqua); text-transform: uppercase; font-weight: 700; }
+        .ticket-chat__sender { font-weight: 700; color: var(--ink); }
+        .ticket-chat__role { color: var(--aqua); text-transform: uppercase; font-weight: 700; font-size: 0.6rem; }
         .ticket-chat__message-date {
           display: block;
-          font-size: 0.62rem;
+          font-size: 0.58rem;
           color: var(--muted);
-          margin-bottom: 2px;
+          margin-bottom: 1px;
           font-weight: 600;
           letter-spacing: 0.02em;
         }
         .ticket-chat__internal-badge {
-          background: var(--aqua); color: var(--white); padding: 1px 6px;
-          border-radius: 3px; font-size: 0.62rem; font-weight: 800;
+          background: var(--aqua); color: var(--white); padding: 1px 5px;
+          border-radius: 3px; font-size: 0.55rem; font-weight: 800;
           text-transform: uppercase; letter-spacing: 0.04em;
         }
-        .ticket-chat__content { font-size: 0.85rem; line-height: 1.5; color: var(--text); white-space: pre-wrap; }
+        .ticket-chat__content { font-size: 0.78rem; line-height: 1.45; color: var(--text); white-space: pre-wrap; }
         .ticket-chat__delete {
           position: absolute; top: 6px; right: 8px; background: none; border: none;
           color: var(--muted); cursor: pointer; font-size: 1rem; padding: 2px 4px; opacity: 0;
@@ -230,18 +230,18 @@ export default function TicketChat({ ticketId }: { ticketId: string }) {
         .ticket-chat__message:hover .ticket-chat__delete { opacity: 1; }
         .ticket-chat__delete:hover { color: var(--danger-text); }
         .ticket-chat__input {
-          display: flex; flex-direction: column; gap: 8px; padding: 12px 16px;
+          display: flex; flex-direction: column; gap: 6px; padding: 8px 12px;
           border-top: 1px solid var(--line); background: rgba(252, 250, 244, 0.95);
         }
         .ticket-chat__input textarea {
-          width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px;
+          width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 5px;
           background: var(--white); color: var(--text); font-family: inherit;
-          font-size: 0.85rem; resize: vertical; line-height: 1.4;
+          font-size: 0.78rem; resize: vertical; line-height: 1.4;
         }
         .ticket-chat__input textarea:focus { outline: 3px solid var(--accent-soft); border-color: var(--aqua); }
         .ticket-chat__input-actions { display: flex; justify-content: space-between; align-items: center; }
-        .ticket-chat__hint { font-size: 0.7rem; color: var(--muted); }
-        .ticket-chat__input .btn-download { padding: 6px 14px; font-size: 0.74rem; }
+        .ticket-chat__hint { font-size: 0.62rem; color: var(--muted); }
+        .ticket-chat__input .btn-download { padding: 4px 12px; font-size: 0.68rem; }
       `}</style>
     </div>
   );
